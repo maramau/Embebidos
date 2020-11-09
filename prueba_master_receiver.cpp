@@ -4,6 +4,8 @@
 #include <iostream>
 using namespace std;
 
+#define TAMANO_BUFFER 80
+
 int main() {
 	// Inicializar led conectado a GPIO y controlador de I2C
 	mraa::Gpio* d_pin = NULL;
@@ -41,25 +43,31 @@ int main() {
     i2c = new mraa::I2c(0);
     i2c->address(8);	//La direccion del esclavo es 8
 
-    uint8_t rx_tx_buf[11];	//Por lo que calcule el tamaño maximo sera de 81 bytes
-														//Este numero podria cambiar
+    uint8_t rx_tx_buf[TAMANO_BUFFER];	//Por lo que calcule el tamaño maximo sera de 81 bytes
+    									//Este numero podria cambiar
+
+    uint8_t size = 24;
 
     // Indefinidamente
     for (;;) {
 
+    	//Armo el paquete
+    	rx_tx_buf[0]='#';
+    	rx_tx_buf[1]=size;
+    	rx_tx_buf[2]='#';
+
 			//Enviar por I2C
-    	strcpy((char*) rx_tx_buf,(const char *) String("*")+size;
-			i2c->write(rx_tx_buf, sizeof(rx_tx_buf));
+			i2c->write(rx_tx_buf, sizeof("1234"));
 
     	// Apagar led y recibir por I2C
     	sleep(1);
     	d_pin->write(0);
-    	i2c->read(rx_tx_buf, 6);
+    	i2c->read(rx_tx_buf, 3);	//Por ahora solo estos bytes, que son el tamano del mensaje que envio
 
     	// Luego de un segundo, encender led e imprimir por stdout
     	sleep(1);
     	d_pin->write(1);
-    	printf((char *) rx_tx_buf, "%s\n");
+    	printf("%i\n", rx_tx_buf[0]);
 
     	// Forzar la salida de stdout
     	fflush(stdout);
