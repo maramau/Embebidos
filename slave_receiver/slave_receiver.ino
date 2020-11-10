@@ -1,19 +1,9 @@
-// Wire Slave Receiver
-// by Nicholas Zambetti <http://www.zambetti.com>
-
-// Demonstrates use of the Wire library
-// Receives data as an I2C/TWI slave device
-// Refer to the "Wire Master Writer" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
 #include <String.h>
 #include <Wire.h>
 
 #define TAMANO_BUFFER 80
 
-uint8_t rx_tx_buf[TAMANO_BUFFER]; //Buffer creado dentro de este modulo. No escribe directamente en el bus
+uint8_t rx_tx_buf[TAMANO_BUFFER]; //falsibuffer creado dentro de este modulo. No escribe directamente en el bus
 uint8_t tamano_mensaje;
 
 void preProcesarEntrada(){
@@ -23,14 +13,14 @@ void preProcesarEntrada(){
 }
 
 
-// function that executes whenever data is received from master
-// this function is registered as an event, see setup()
+// Ejecuta cada vez que recibe datos del amo
+// Es un evento, se debe asociar en el setup con Wire.onReceive()
 void receiveEvent(int howMany) {
   int i = 0;
-  while (Wire.available() > 1) { // loop through all but the last
-    char c = Wire.read(); // receive byte as a character
-    //Serial.print(c);         // print the character
-    rx_tx_buf[i]=c;
+  while (Wire.available() > 1) {
+    char c = Wire.read();
+    //Serial.print(c);
+    rx_tx_buf[i]=c;             //Almaceno lo leido en el buffer real en mi falsibuffer
     i++;
   }
 
@@ -45,17 +35,16 @@ void receiveEvent(int howMany) {
 void requestEvent() {
   preProcesarEntrada();
   Serial.println(tamano_mensaje);
-  Wire.write(tamano_mensaje); // respond with message of 6 bytes
-  // as expected by master
+  Wire.write(tamano_mensaje); // Respuesta enviada al amo
 }
 
 
 
 void setup() {
-  Wire.begin(8);                // join i2c bus with address #8
-  Wire.onReceive(receiveEvent); // register event
-  Wire.onRequest(requestEvent); // register event
-  Serial.begin(9600);           // start serial for output
+  Wire.begin(8);                // Me uno al I2C con direccion 8
+  Wire.onReceive(receiveEvent); // Registro funciones a eventos
+  Wire.onRequest(requestEvent);
+  Serial.begin(9600);
 }
 
 void loop() {
