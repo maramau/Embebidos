@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-#define TAMANO_BUFFER 80
+#define TAMANO_BUFFER 30
 
 int main() {
 	// Inicializar led conectado a GPIO y controlador de I2C
