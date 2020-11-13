@@ -1,41 +1,79 @@
 #include <String.h>
 #include <Wire.h>
+#include "Arduino.h"
 
-#define TAMANO_BUFFER 80
+#define CARACTER_INICIAL '*'
+#define CARACTER_SEPARADOR '/'
 
-uint8_t rx_tx_buf[TAMANO_BUFFER]; //falsibuffer creado dentro de este modulo. No escribe directamente en el bus
 uint8_t tamano_mensaje;
-
-void preProcesarEntrada(){
-  //Saco los '*' y separo el tamano, el payload y el mensaje
-  tamano_mensaje = (uint8_t)rx_tx_buf[1]; //Ahora se que el ultimo '*' esta en tamano_mensaje. Puedo ignorarlo si quiero
-
-}
+uint8_t tipo_mensaje[14];
+float fl1 = 14.25;
+uint8_t f1[4];
+uint8_t f2[4];
+uint8_t f3[4];
+uint8_t f4[4];
 
 
 // Ejecuta cada vez que recibe datos del amo
 // Es un evento, se debe asociar en el setup con Wire.onReceive()
 void receiveEvent(int howMany) {
-  int i = 0;
-  while (Wire.available() > 1) {
-    char c = Wire.read();
-    //Serial.print(c);
-    rx_tx_buf[i]=c;             //Almaceno lo leido en el buffer real en mi falsibuffer
+  uint8_t i = 0;
+  uint8_t c = NULL;
+
+  //Tomo el tamano del mensaje
+  if (Wire.available() > 3){  //Tengo 4 caracteres para leer
+    c = Wire.read();  //Leo el caracter inicial
+    tamano_mensaje = Wire.read(); //leo el tamano del mensaje
+    c = Wire.read();  //Tomo el CARACTER_SEPARADOR
+    c = Wire.read();  //Tomo el primer caracter de tipo_mensaje
+  }
+
+  //Tomo el tipo de mensaje
+  while(Wire.available()>0 && c!=CARACTER_SEPARADOR){
+    tipo_mensaje[i]= (char) c;
+    c = Wire.read();
     i++;
   }
 
-  while(i<TAMANO_BUFFER){
-    rx_tx_buf[i] = '/0';
-    i++;
+  //Estoy apuntando al caracter separador
+  if(Wire.available() > 0){
+    c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
 
-  Serial.println((char *)rx_tx_buf);
+  i=0;
+
+  Serial.print(tamano_mensaje);
+  Serial.print(' ');
+  while(tipo_mensaje[i]!=NULL){
+    Serial.print((char)tipo_mensaje[i]);
+    i++;
+  }
+  Serial.print(' ');
+  Serial.println(f1[0]);/*
+  Serial.print(f2);
+  Serial.print(f3);
+  Serial.println(f4);*/
 }
 
 void requestEvent() {
-  preProcesarEntrada();
-  Serial.println(tamano_mensaje);
-  Wire.write(tamano_mensaje); // Respuesta enviada al amo
+  uint8_t i = 0;
+
+  //Serial.println(tamano_mensaje);
+  //Wire.write(tamano_mensaje); // Respuesta enviada al amo
+  //Considerar meter todo en un gran buffer de uint8_t llamada mensaje y llamar solo una vez a Wire.write
+  Wire.write('*');
+  Wire.write(tamano_mensaje);
+  Wire.write('/');
+    while((i<sizeof(tipo_mensaje))){
+    Wire.write(tipo_mensaje[i]);
+    i++;
+  }
+  Wire.write('/');
+  Wire.write(f1,4);/*
+  Wire.write(f2);
+  Wire.write(f3);
+  Wire.write(f4);*/
+  Wire.write('*');
 }
 
 
