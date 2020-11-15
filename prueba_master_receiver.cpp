@@ -11,6 +11,7 @@ using namespace std;
 									//+ 4 floats (16 bytes)
 
 uint8_t tamano_respuesta;
+uint8_t tamano_pedido;
 
 //Toma un entero por consola y elije el tipo de mensaje a enviar
 	//calcula tambien el tamano esperado de la respuesta en base a la eleccion
@@ -25,22 +26,27 @@ char* recibir_pedido(){
 	case 1:
 		toReturn = "OBTENER_TEMP";
 		tamano_respuesta = 23;
+		tamano_pedido =  16;
 		break;
 	case 2:
 		toReturn = "OBTENER_MAX";
 		tamano_respuesta = 23;
+		tamano_pedido =  15;
 		break;
 	case 3:
 		toReturn = "OBTENER_MIN";
 		tamano_respuesta = 23;
+		tamano_pedido =  15;
 		break;
 	case 4:
 		toReturn = "OBTENER_PROM";
 		tamano_respuesta = 23;
+		tamano_pedido =  16;
 		break;
 	case 5:
 		toReturn = "OBTENER_TODO";
 		tamano_respuesta = 35;
+		tamano_pedido =  16;
 		break;
 	default:
 		toReturn = "Nice try. Zero charisma.\n";
@@ -90,7 +96,6 @@ int main() {
     i2c->address(8);	//La direccion del esclavo es 8
 
     uint8_t rx_tx_buf[TAMANO_MAXIMO_BUFFER];
-    uint8_t tamano_mensaje;	//Tamano del mensaje ()
 	uint8_t puntero_mensaje = 0;
 	uint8_t i = 0;
 	char* tipo_mensaje;
@@ -104,13 +109,10 @@ int main() {
 
     			//Considerar hacer una funcion crearMensaje()
     	tipo_mensaje = recibir_pedido();
-
     	if(tamano_respuesta != -1){
 			//Armo el paquete
 			rx_tx_buf[0]='*';
-				//Agregare el tamano del mensaje mas adelante
-			rx_tx_buf[2]='/';
-			puntero_mensaje = 3;
+			puntero_mensaje = 1;
 			i = 0;
 			//Agrego el tipo del mensaje
 			while(tipo_mensaje[i]!='\0'){
@@ -118,16 +120,16 @@ int main() {
 				puntero_mensaje++;
 				i++;
 			}
+			rx_tx_buf[puntero_mensaje++] = '/';
 			//Como mando mensajes OBTENER no hay payload
+			//Agrego el tamano total del mensaje
+			rx_tx_buf[puntero_mensaje++]= tamano_pedido;
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje] = '*';
 
-			//Agrego el tamano total del mensaje
-			tamano_mensaje=puntero_mensaje+1;
-			rx_tx_buf[1]= tamano_mensaje;
-
+			printf("Pedido: %i\n", rx_tx_buf[14]);
 			//Enviar por I2C
-			i2c->write(rx_tx_buf, tamano_mensaje);
+			i2c->write(rx_tx_buf, tamano_pedido);
 
 			// Apagar led y recibir por I2C
 			sleep(1);
@@ -142,7 +144,7 @@ int main() {
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);
-			printf("%s\n", rx_tx_buf);
+			printf("Respuesta: %s\n", rx_tx_buf);
 
 			// Forzar la salida de stdout
 			fflush(stdout);

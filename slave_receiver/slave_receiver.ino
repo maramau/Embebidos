@@ -65,12 +65,10 @@ char* seleccionar_payload(){
 void receiveEvent(int howMany) {
   uint8_t i = 0;
   char c = NULL;
-
+  
   //Tomo el tamano del mensaje
-  if (Wire.available() > 3){  //Tengo 4 caracteres para leer
+  if (Wire.available() > 1){  //Tengo 2 caracteres para leer
     c = Wire.read();  //Leo el caracter inicial
-    c = Wire.read(); //leo el tamano del mensaje (no lo necesito)
-    c = Wire.read();  //Tomo el CARACTER_SEPARADOR
     c = Wire.read();  //Tomo el primer caracter de tipo_mensaje_recibido
   }
   //Tomo el tipo de mensaje
@@ -81,11 +79,12 @@ void receiveEvent(int howMany) {
   }
   tipo_mensaje_recibido[i] = '\0';
   
-  //Estoy apuntando al caracter separador
+  //Estoy apuntando al caracter FINALIZADOR
+    //Si queda algo mas es basura
   if(Wire.available() > 0){
     c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
-  
+  Serial.print(tipo_mensaje_recibido);
 }
 
 void requestEvent() {
