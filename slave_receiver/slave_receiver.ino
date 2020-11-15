@@ -14,18 +14,18 @@ char* seleccionar_tipo_respuesta(){
   char* toReturn;
   
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
-    toReturn = "AESPONDER_TEMP";
+    toReturn = "RESPONDER_TEMP";
   }else{
     if(strcmp("OBTENER_MIN",tipo_recibido) == 0){
-      toReturn = "BESPONDER_MIN";
+      toReturn = "RESPONDER_MIN";
     }else{
       if(strcmp("OBTENER_MAX",tipo_recibido) == 0){
-        toReturn = "CESPONDER_MAX";
+        toReturn = "RESPONDER_MAX";
       }else{
         if(strcmp("OBTENER_PROM",tipo_recibido) == 0){
-          toReturn = "DESPONDER_PROM\0";
+          toReturn = "RESPONDER_PROM";
         }else{
-          toReturn = "EESPONDER_TODO";
+          toReturn = "RESPONDER_TODO";
         }
       }
     }
