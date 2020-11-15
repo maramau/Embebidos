@@ -55,6 +55,7 @@ int main() {
 	uint8_t puntero_mensaje = 0;
 	uint8_t i = 0;
 	uint8_t tamano_esperado = 4+1+sizeof("RESPONDER_PROM")+4;
+	tamano_esperado = 35;
 
     // Indefinidamente
     for (;;) {
@@ -101,7 +102,7 @@ int main() {
     	// Luego de un segundo, encender led e imprimir por stdout
     	sleep(1);
     	d_pin->write(1);
-    	printf("%c\n", rx_tx_buf[3]);
+    	printf("%s\n", rx_tx_buf);
 
     	// Forzar la salida de stdout
     	fflush(stdout);

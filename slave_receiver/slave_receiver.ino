@@ -7,14 +7,11 @@
 
 uint8_t tamano_mensaje;
 char* tipo_mensaje_recibido;
-char payload[20];
 
-//Recibe un puntero donde escribira el tipo de mensaje de la respuesta
-  //y un puntero que apunta al payload
+//Retorna un puntero donde se escribio el tipo de mensaje de la respuesta
 char* seleccionar_tipo_respuesta(){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
   char* toReturn;
-  float f1 = 19.25;
 
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     toReturn = "AESPONDER_TEMP";
@@ -26,9 +23,34 @@ char* seleccionar_tipo_respuesta(){
         toReturn = "CESPONDER_MAX";
       }else{
         if(strcmp("OBTENER_PROM",tipo_recibido) == 0){
-          toReturn = "DESPONDER_PROM";
+          toReturn = "DESPONDER_PROM\0";
         }else{
           toReturn = "EESPONDER_TODO";
+        }
+      }
+    }
+  }
+  return toReturn;
+}
+
+//Retorna un puntero donde se escribio el payload de la respuesta
+char* seleccionar_payload(){
+  char* tipo_recibido=(char*)tipo_mensaje_recibido;
+  char* toReturn;
+
+  if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
+    toReturn = "TEMP_ACTUAL";
+  }else{
+    if(strcmp("OBTENER_MIN",tipo_recibido) == 0){
+      toReturn = "TEMP_MIN";
+    }else{
+      if(strcmp("OBTENER_MAX",tipo_recibido) == 0){
+        toReturn = "TEMP_MAX";
+      }else{
+        if(strcmp("OBTENER_PROM",tipo_recibido) == 0){
+          toReturn = "TEMP_PROM\0";
+        }else{
+          toReturn = "TEMP_TODO";
         }
       }
     }
@@ -69,16 +91,18 @@ void receiveEvent(int howMany) {
 void requestEvent() {
   uint8_t i = 0;
   char* tipo_mensaje_respuesta;
+  char* payload;
 
   Wire.write('*');
   Wire.write(tamano_mensaje);
   Wire.write('/');
   tipo_mensaje_respuesta = seleccionar_tipo_respuesta();
-  //Serial.println(tipo_mensaje_respuesta);
   Wire.write(tipo_mensaje_respuesta);
   Wire.write('/');
-  //ACa irian los write de los floats
-  Wire.write('*');
+  //Aca irian los write de los floats
+  payload = seleccionar_payload();
+  Wire.write(payload);
+  Wire.write("*\0");
 }
 
 
