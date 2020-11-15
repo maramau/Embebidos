@@ -88,7 +88,7 @@ int main() {
 		//Enviar por I2C
 		i2c->write(rx_tx_buf, tamano_mensaje);
 
-    	// Apagar led y recibir por I2C
+		// Apagar led y recibir por I2C
     	sleep(1);
     	d_pin->write(0);
     	i2c->read(rx_tx_buf, tamano_esperado);
@@ -101,7 +101,7 @@ int main() {
     	// Luego de un segundo, encender led e imprimir por stdout
     	sleep(1);
     	d_pin->write(1);
-    	printf("%i %s\n", rx_tx_buf[1], rx_tx_buf[3]);
+    	printf("%c\n", rx_tx_buf[3]);
 
     	// Forzar la salida de stdout
     	fflush(stdout);

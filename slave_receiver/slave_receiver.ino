@@ -15,7 +15,7 @@ char* seleccionar_tipo_respuesta(){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
   char* toReturn;
   float f1 = 19.25;
-  
+
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     toReturn = "AESPONDER_TEMP";
   }else{
@@ -58,20 +58,18 @@ void receiveEvent(int howMany) {
     i++;
   }
   tipo_mensaje_recibido[i] = '\0';
-  
+
   //Estoy apuntando al caracter separador
   if(Wire.available() > 0){
     c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
 
-  Serial.println(tipo_mensaje_recibido);
-  
 }
 
 void requestEvent() {
   uint8_t i = 0;
   char* tipo_mensaje_respuesta;
-  
+
   Wire.write('*');
   Wire.write(tamano_mensaje);
   Wire.write('/');
