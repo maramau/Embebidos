@@ -102,7 +102,7 @@ int main() {
     	// Luego de un segundo, encender led e imprimir por stdout
     	sleep(1);
     	d_pin->write(1);
-    	printf("%s\n", rx_tx_buf);
+    	printf("%i\n", rx_tx_buf[26]);
 
     	// Forzar la salida de stdout
     	fflush(stdout);

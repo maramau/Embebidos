@@ -4,15 +4,15 @@
 
 #define CARACTER_INICIAL '*'
 #define CARACTER_SEPARADOR '/'
+#define BYTES_SIMBOLOS 4
 
-uint8_t tamano_mensaje;
 char* tipo_mensaje_recibido;
 
 //Retorna un puntero donde se escribio el tipo de mensaje de la respuesta
 char* seleccionar_tipo_respuesta(){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
   char* toReturn;
-
+  
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     toReturn = "AESPONDER_TEMP";
   }else{
@@ -37,7 +37,7 @@ char* seleccionar_tipo_respuesta(){
 char* seleccionar_payload(){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
   char* toReturn;
-
+  
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     toReturn = "TEMP_ACTUAL";
   }else{
@@ -69,7 +69,7 @@ void receiveEvent(int howMany) {
   //Tomo el tamano del mensaje
   if (Wire.available() > 3){  //Tengo 4 caracteres para leer
     c = Wire.read();  //Leo el caracter inicial
-    tamano_mensaje = Wire.read(); //leo el tamano del mensaje
+    c = Wire.read(); //leo el tamano del mensaje (no lo necesito)
     c = Wire.read();  //Tomo el CARACTER_SEPARADOR
     c = Wire.read();  //Tomo el primer caracter de tipo_mensaje_recibido
   }
@@ -80,29 +80,28 @@ void receiveEvent(int howMany) {
     i++;
   }
   tipo_mensaje_recibido[i] = '\0';
-
+  
   //Estoy apuntando al caracter separador
   if(Wire.available() > 0){
     c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
-
+  
 }
 
 void requestEvent() {
-  uint8_t i = 0;
-  char* tipo_mensaje_respuesta;
-  char* payload;
-
+  uint8_t i = 0, tamano_respuesta;
+  char* tipo_mensaje_respuesta, * payload;
+  
   Wire.write('*');
-  Wire.write(tamano_mensaje);
-  Wire.write('/');
   tipo_mensaje_respuesta = seleccionar_tipo_respuesta();
   Wire.write(tipo_mensaje_respuesta);
   Wire.write('/');
-  //Aca irian los write de los floats
   payload = seleccionar_payload();
   Wire.write(payload);
-  Wire.write("*\0");
+  Wire.write('/');
+  tamano_respuesta = BYTES_SIMBOLOS + strlen(tipo_mensaje_respuesta) + strlen(payload) + 1;
+  Wire.write(tamano_respuesta);
+  Wire.write('*');
 }
 
 
