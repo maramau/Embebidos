@@ -4,7 +4,6 @@
 
 #define CARACTER_INICIAL '*'
 #define CARACTER_SEPARADOR '/'
-#define BYTES_SIMBOLOS 4
 #define TAMANO_FLOAT 8
 
 char* tipo_mensaje_recibido;
@@ -35,9 +34,9 @@ char* seleccionar_tipo_respuesta(){
 }
 
 //Retorna un puntero donde se escribio el payload de la respuesta
-void seleccionar_payload(char t_act[TAMANO_FLOAT], char t_min[TAMANO_FLOAT], char t_max[TAMANO_FLOAT], char t_prom[TAMANO_FLOAT]){
+void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
-  float f1 = 11.11, f2 = 22.22, f3 = 33.33, f4 = 24.24;
+  float f1 = 1.11, f2 = 2.22, f3 = 3.33, f4 = 4.44;
 
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     //f1 es el float a adaptar, 3 is mininum width, 2 is precision; float value is copied onto buff
@@ -56,10 +55,6 @@ void seleccionar_payload(char t_act[TAMANO_FLOAT], char t_min[TAMANO_FLOAT], cha
           dtostrf(f2, 3, 2, t_min);
           dtostrf(f3, 3, 2, t_max);
           dtostrf(f4, 3, 2, t_prom);
-          Serial.println(String(t_act));
-          Serial.println(String(t_min));
-          Serial.println(String(t_max));
-          Serial.println(String(t_prom));
         }
       }
     }
@@ -92,42 +87,46 @@ void receiveEvent(int howMany) {
   if(Wire.available() > 0){
     c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
-  //Serial.print(tipo_mensaje_recibido);
 }
 
 void requestEvent() {
-  uint8_t i = 0, tamano_respuesta;
+  int tamano_respuesta;
   char* tipo_mensaje_respuesta, * payload;
-   char t_act[TAMANO_FLOAT];
-   char t_min[TAMANO_FLOAT];
-   char t_max[TAMANO_FLOAT];
-   char t_prom[TAMANO_FLOAT];
+  char mensaje [50];
+  char t_act[TAMANO_FLOAT];
+  char t_min[TAMANO_FLOAT];
+  char t_max[TAMANO_FLOAT];
+  char t_prom[TAMANO_FLOAT];
 
-  Wire.write('*');
+
+
   tipo_mensaje_respuesta = seleccionar_tipo_respuesta();
-  Wire.write(tipo_mensaje_respuesta);
-  Wire.write('/');
-  seleccionar_payload(t_act,t_min,t_max,t_prom);
 
-  if(t_act[0] != '\0'){
-    Wire.write(t_act,5);
-    //Wire.write('/');
-  }
-  if(t_min[0] != '\0'){
-    Wire.write(t_min,5);
-    //Wire.write('/');
-  }
-  if(t_max[0] != '\0'){
-    //Wire.write(t_max,5);
-    //Wire.write('/');
-  }
-  if(t_prom[0] != '\0'){
-    //Wire.write(t_prom,5);
-    //Wire.write('/');
-  }
-  tamano_respuesta = BYTES_SIMBOLOS + strlen(tipo_mensaje_respuesta) + strlen(payload) + 1;
-  //Wire.write(tamano_respuesta);
-  Wire.write('$');
+  mensaje[0] = '*';
+  mensaje[1] = '\0';
+  strcat(mensaje,(char*)tipo_mensaje_respuesta);
+  strcat(mensaje,"/");
+
+
+  seleccionar_payload(t_act,t_min,t_max,t_prom);
+  strcat(mensaje,t_act);
+  strcat(mensaje,"-\0");
+
+  strcat(mensaje,t_min);
+
+
+  strcat(mensaje,"-\0");
+  strcat(mensaje,t_max);
+
+  //strcat(mensaje,"-\0");
+  //strcat(mensaje,t_prom);
+
+  strcat(mensaje,"/");
+  Wire.write(mensaje);
+
+  tamano_respuesta =(int) strlen(mensaje) + 2;
+  Wire.write(tamano_respuesta);
+  Wire.write("*\0");
 }
 
 

@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-#define TAMANO_MAXIMO_BUFFER 50	//Como maximo habra
+#define TAMANO_MAXIMO_BUFFER 80	//Como maximo habra
 									//4 caracteres separadores (4 bytes)
 									//+ 1 char del tamano (1 bytes)
 									//+ 14 chars del tipo de mensaje (14 bytes)
@@ -12,6 +12,13 @@ using namespace std;
 
 uint8_t tamano_respuesta;
 uint8_t tamano_pedido;
+
+void limpiar_buffer(uint8_t* buffer){
+	uint8_t i = 0;
+	while (buffer[i]!='\0'){
+		buffer[i++] = '\0';
+	}
+}
 
 //Toma un entero por consola y elije el tipo de mensaje a enviar
 	//calcula tambien el tamano esperado de la respuesta en base a la eleccion
@@ -108,6 +115,7 @@ int main() {
     			//y el valor de tipo_mensaje y tamano_respuesta
 
     			//Considerar hacer una funcion crearMensaje()
+    	limpiar_buffer(rx_tx_buf);
     	tipo_mensaje = recibir_pedido();
     	if(tamano_respuesta != -1){
 			//Armo el paquete
@@ -136,7 +144,7 @@ int main() {
 			i2c->read(rx_tx_buf, tamano_respuesta);
 
 
-
+/*
 			//Aca puedo llamar a una funcion que tome el mensaje leido y lo separe en variables para mostrarlas por pantalla
 			i=0;
 			uint8_t temp[TAMANO_MAXIMO_BUFFER];
@@ -144,15 +152,12 @@ int main() {
 				temp[i]=rx_tx_buf[i];
 				i++;
 			}
-			temp[i]='\0';
+			temp[i]='\0';*/
+
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);
-			//float f1, f2;
-			//f1 = (float) rx_tx_buf[16];
-			//f2 = (float) rx_tx_buf[17];
-			printf("Respuesta: %c %c %c\n",rx_tx_buf[21], rx_tx_buf[22],rx_tx_buf[23]);
-			printf("%s\n", temp);
+			printf("%s %i %c\n", rx_tx_buf, rx_tx_buf[31], rx_tx_buf[32]);
 
 			// Forzar la salida de stdout
 			fflush(stdout);
