@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-#define TAMANO_MAXIMO_BUFFER 35	//Como maximo habra
+#define TAMANO_MAXIMO_BUFFER 50	//Como maximo habra
 									//4 caracteres separadores (4 bytes)
 									//+ 1 char del tamano (1 bytes)
 									//+ 14 chars del tipo de mensaje (14 bytes)
@@ -25,7 +25,7 @@ char* recibir_pedido(){
 	switch(str){
 	case 1:
 		toReturn = "OBTENER_TEMP";
-		tamano_respuesta = 23;
+		tamano_respuesta = 24;
 		tamano_pedido =  16;
 		break;
 	case 2:
@@ -40,12 +40,12 @@ char* recibir_pedido(){
 		break;
 	case 4:
 		toReturn = "OBTENER_PROM";
-		tamano_respuesta = 23;
+		tamano_respuesta = 24;
 		tamano_pedido =  16;
 		break;
 	case 5:
 		toReturn = "OBTENER_TODO";
-		tamano_respuesta = 35;
+		tamano_respuesta = 39;
 		tamano_pedido =  16;
 		break;
 	default:
@@ -127,7 +127,6 @@ int main() {
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje] = '*';
 
-			printf("Pedido: %i\n", rx_tx_buf[14]);
 			//Enviar por I2C
 			i2c->write(rx_tx_buf, tamano_pedido);
 
@@ -139,12 +138,21 @@ int main() {
 
 
 			//Aca puedo llamar a una funcion que tome el mensaje leido y lo separe en variables para mostrarlas por pantalla
-
-
+			i=0;
+			uint8_t temp[TAMANO_MAXIMO_BUFFER];
+			while(i<tamano_respuesta){
+				temp[i]=rx_tx_buf[i];
+				i++;
+			}
+			temp[i]='\0';
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);
-			printf("Respuesta: %s\n", rx_tx_buf);
+			//float f1, f2;
+			//f1 = (float) rx_tx_buf[16];
+			//f2 = (float) rx_tx_buf[17];
+			printf("Respuesta: %c %c %c\n",rx_tx_buf[21], rx_tx_buf[22],rx_tx_buf[23]);
+			printf("%s\n", temp);
 
 			// Forzar la salida de stdout
 			fflush(stdout);

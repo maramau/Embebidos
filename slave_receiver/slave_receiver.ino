@@ -5,6 +5,7 @@
 #define CARACTER_INICIAL '*'
 #define CARACTER_SEPARADOR '/'
 #define BYTES_SIMBOLOS 4
+#define TAMANO_FLOAT 8
 
 char* tipo_mensaje_recibido;
 
@@ -12,7 +13,7 @@ char* tipo_mensaje_recibido;
 char* seleccionar_tipo_respuesta(){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
   char* toReturn;
-  
+
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
     toReturn = "RESPONDER_TEMP";
   }else{
@@ -34,28 +35,35 @@ char* seleccionar_tipo_respuesta(){
 }
 
 //Retorna un puntero donde se escribio el payload de la respuesta
-char* seleccionar_payload(){
+void seleccionar_payload(char t_act[TAMANO_FLOAT], char t_min[TAMANO_FLOAT], char t_max[TAMANO_FLOAT], char t_prom[TAMANO_FLOAT]){
   char* tipo_recibido=(char*)tipo_mensaje_recibido;
-  char* toReturn;
-  
+  float f1 = 11.11, f2 = 22.22, f3 = 33.33, f4 = 24.24;
+
   if(strcmp("OBTENER_TEMP",tipo_recibido) == 0){
-    toReturn = "TEMP_ACTUAL";
+    //f1 es el float a adaptar, 3 is mininum width, 2 is precision; float value is copied onto buff
+    dtostrf(f1, 3, 2, t_act);
   }else{
     if(strcmp("OBTENER_MIN",tipo_recibido) == 0){
-      toReturn = "TEMP_MIN";
+      dtostrf(f2, 3, 2, t_min);
     }else{
       if(strcmp("OBTENER_MAX",tipo_recibido) == 0){
-        toReturn = "TEMP_MAX";
+        dtostrf(f3, 3, 2, t_max);
       }else{
         if(strcmp("OBTENER_PROM",tipo_recibido) == 0){
-          toReturn = "TEMP_PROM\0";
+          dtostrf(f4, 3, 2, t_prom);
         }else{
-          toReturn = "TEMP_TODO";
+          dtostrf(f1, 3, 2, t_act);
+          dtostrf(f2, 3, 2, t_min);
+          dtostrf(f3, 3, 2, t_max);
+          dtostrf(f4, 3, 2, t_prom);
+          Serial.println(String(t_act));
+          Serial.println(String(t_min));
+          Serial.println(String(t_max));
+          Serial.println(String(t_prom));
         }
       }
     }
   }
-  return toReturn;
 }
 
 
@@ -65,7 +73,7 @@ char* seleccionar_payload(){
 void receiveEvent(int howMany) {
   uint8_t i = 0;
   char c = NULL;
-  
+
   //Tomo el tamano del mensaje
   if (Wire.available() > 1){  //Tengo 2 caracteres para leer
     c = Wire.read();  //Leo el caracter inicial
@@ -78,29 +86,48 @@ void receiveEvent(int howMany) {
     i++;
   }
   tipo_mensaje_recibido[i] = '\0';
-  
+
   //Estoy apuntando al caracter FINALIZADOR
     //Si queda algo mas es basura
   if(Wire.available() > 0){
     c = Wire.read();  //Salteo el CARACTER_SEPARADOR y apunto al primer caracter del payload
   }
-  Serial.print(tipo_mensaje_recibido);
+  //Serial.print(tipo_mensaje_recibido);
 }
 
 void requestEvent() {
   uint8_t i = 0, tamano_respuesta;
   char* tipo_mensaje_respuesta, * payload;
-  
+   char t_act[TAMANO_FLOAT];
+   char t_min[TAMANO_FLOAT];
+   char t_max[TAMANO_FLOAT];
+   char t_prom[TAMANO_FLOAT];
+
   Wire.write('*');
   tipo_mensaje_respuesta = seleccionar_tipo_respuesta();
   Wire.write(tipo_mensaje_respuesta);
   Wire.write('/');
-  payload = seleccionar_payload();
-  Wire.write(payload);
-  Wire.write('/');
+  seleccionar_payload(t_act,t_min,t_max,t_prom);
+
+  if(t_act[0] != '\0'){
+    Wire.write(t_act,5);
+    //Wire.write('/');
+  }
+  if(t_min[0] != '\0'){
+    Wire.write(t_min,5);
+    //Wire.write('/');
+  }
+  if(t_max[0] != '\0'){
+    //Wire.write(t_max,5);
+    //Wire.write('/');
+  }
+  if(t_prom[0] != '\0'){
+    //Wire.write(t_prom,5);
+    //Wire.write('/');
+  }
   tamano_respuesta = BYTES_SIMBOLOS + strlen(tipo_mensaje_respuesta) + strlen(payload) + 1;
-  Wire.write(tamano_respuesta);
-  Wire.write('*');
+  //Wire.write(tamano_respuesta);
+  Wire.write('$');
 }
 
 
