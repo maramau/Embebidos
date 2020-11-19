@@ -38,7 +38,7 @@ uint8_t seleccionar_tipo_respuesta(){
       toReturn = RESPONDER_TODO;
     break;
   }
-  
+
   return toReturn;
 }
 
@@ -78,7 +78,7 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
 void receiveEvent(int howMany){
   uint8_t i = 0;
   char c = NULL;
- 
+
   //Tomo el tamano del mensaje
   if (Wire.available() > 1){  //Tengo 2 caracteres para leer
     c = Wire.read();  //Leo el caracter inicial
@@ -95,7 +95,7 @@ void receiveEvent(int howMany){
   //Estoy apuntando al caracter FINALIZADOR
     //Si queda algo mas es basura
   while(c != CARACTER_INI_FIN){
-    c = Wire.read(); 
+    c = Wire.read();
   }
 }
 
@@ -107,7 +107,7 @@ void requestEvent() {
   char t_min[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
   char t_max[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
   char t_prom[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
-  
+
   mensaje[0] = CARACTER_INI_FIN;
   mensaje[1] = seleccionar_tipo_respuesta();
   mensaje[2] = '/';
@@ -124,7 +124,7 @@ void requestEvent() {
   tamano_respuesta =(int) strlen(mensaje) + 2;
   Wire.write(tamano_respuesta);
   Wire.write(CARACTER_INI_FIN);
-  
+
   Serial.println(mensaje);
 }
 

@@ -13,7 +13,7 @@ using namespace std;
 										//3 separadores (3 bytes)
 										//+1 char del tipo de mensaje (1 byte)
 										//+1 char del tamano del mensaje (1 byte)
-#define TAMANO_MAXIMO_RESPUESTA 29	//Como maximo habra
+#define TAMANO_MAXIMO_RESPUESTA 30	//Como maximo habra
 										//4 caracteres separadores (4 bytes)
 										//+1 char del tamano (1 bytes)
 										//+1 char del tipo de mensaje (1 bytes)
@@ -32,13 +32,6 @@ using namespace std;
 
 #define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
-
-void limpiar_buffer(uint8_t* buffer){
-	uint8_t i = 0;
-	while (buffer[i]!='\0'){
-		buffer[i++] = '\0';
-	}
-}
 
 //Toma un entero por consola y elije el tipo de mensaje a enviar
 	//calcula tambien el tamano esperado de la respuesta en base a la eleccion
@@ -70,6 +63,10 @@ uint8_t recibir_pedido(){
 	}
 
 	return toReturn;
+}
+
+void respuesta(){
+
 }
 
 
@@ -117,7 +114,6 @@ int main() {
     // Indefinidamente
     for (;;) {
     			//Considerar hacer una funcion crearMensaje()
-    	limpiar_buffer(rx_tx_buf);
     	tipo_mensaje = recibir_pedido();
     	if(tipo_mensaje != -1){
     		puntero_mensaje = 0;
@@ -132,17 +128,14 @@ int main() {
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
 			rx_tx_buf[puntero_mensaje] = '\0';
-
 			//Enviar por I2C
 			printf("Escribo: %s\n",rx_tx_buf);
 			i2c->write(rx_tx_buf, TAMANO_UNICO_PEDIDO);
-
 			// Apagar led y recibir por I2C
 			sleep(1);
 			d_pin->write(0);
 
 			i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
-
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);
@@ -150,6 +143,7 @@ int main() {
 
 
 			//Aca separar el buffer en variables y... analizar? mostrar por consola?
+
 
 			// Forzar la salida de stdout
 			fflush(stdout);
