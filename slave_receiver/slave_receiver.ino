@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include "Arduino.h"
 
-#define CARACTER_INICIAL '*'
+#define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
 #define TAMANO_FLOAT 8
 #define OBTENER_TEMP '1'
@@ -38,7 +38,7 @@ uint8_t seleccionar_tipo_respuesta(){
       toReturn = RESPONDER_TODO;
     break;
   }
-
+  
   return toReturn;
 }
 
@@ -78,7 +78,7 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
 void receiveEvent(int howMany){
   uint8_t i = 0;
   char c = NULL;
-
+ 
   //Tomo el tamano del mensaje
   if (Wire.available() > 1){  //Tengo 2 caracteres para leer
     c = Wire.read();  //Leo el caracter inicial
@@ -94,8 +94,8 @@ void receiveEvent(int howMany){
 
   //Estoy apuntando al caracter FINALIZADOR
     //Si queda algo mas es basura
-  while(c != CARACTER_INICIAL){
-    c = Wire.read();
+  while(c != CARACTER_INI_FIN){
+    c = Wire.read(); 
   }
 }
 
@@ -107,27 +107,24 @@ void requestEvent() {
   char t_min[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
   char t_max[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
   char t_prom[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
-
-  mensaje[0] = CARACTER_INICIAL;
+  
+  mensaje[0] = CARACTER_INI_FIN;
   mensaje[1] = seleccionar_tipo_respuesta();
   mensaje[2] = '/';
   mensaje[3] = '\0';
 
   seleccionar_payload(t_act,t_min,t_max,t_prom);
   strcat(mensaje,t_act);
-  //strcat(mensaje,"-");
   strcat(mensaje,t_min);
-  //strcat(mensaje,"-");
   strcat(mensaje,t_max);
-  //strcat(mensaje,"-");
   strcat(mensaje,t_prom);
 
   strcat(mensaje,"/");
   Wire.write(mensaje);
   tamano_respuesta =(int) strlen(mensaje) + 2;
   Wire.write(tamano_respuesta);
-  Wire.write(CARACTER_INICIAL);
-
+  Wire.write(CARACTER_INI_FIN);
+  
   Serial.println(mensaje);
 }
 

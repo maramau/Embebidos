@@ -1,13 +1,5 @@
 #include "mraa.hpp"
 #include "String.h"
-
-/*#include <common.h>
-#include <gpio.hpp>
-#include <i2c.hpp>
-#include <types.h>
-#include <unistd.h>
-#include <cstdint>
-#include <cstdio>*/
 #include <iostream>
 
 using namespace std;
@@ -21,7 +13,7 @@ using namespace std;
 										//3 separadores (3 bytes)
 										//+1 char del tipo de mensaje (1 byte)
 										//+1 char del tamano del mensaje (1 byte)
-#define TAMANO_MAXIMO_RESPUESTA 30	//Como maximo habra
+#define TAMANO_MAXIMO_RESPUESTA 29	//Como maximo habra
 										//4 caracteres separadores (4 bytes)
 										//+1 char del tamano (1 bytes)
 										//+1 char del tipo de mensaje (1 bytes)
@@ -38,7 +30,8 @@ using namespace std;
 #define RESPONDER_PROM '9'
 #define RESPONDER_TODO '0'
 
-uint8_t tamano_pedido;
+#define CARACTER_INI_FIN '*'
+#define CARACTER_SEPARADOR '/'
 
 void limpiar_buffer(uint8_t* buffer){
 	uint8_t i = 0;
@@ -82,6 +75,11 @@ uint8_t recibir_pedido(){
 
 
 int main() {
+    uint8_t rx_tx_buf[TAMANO_MAXIMO_RESPUESTA];
+	uint8_t puntero_mensaje = 0;
+	uint8_t tipo_mensaje;
+
+
 	// Inicializar led conectado a GPIO y controlador de I2C
 	mraa::Gpio* d_pin = NULL;
 
@@ -111,41 +109,28 @@ int main() {
 		return MRAA_ERROR_UNSPECIFIED;
 	}
 
-
-
 	//Controlador del I2C que sera usado para transmitir los mensajes
     mraa::I2c* i2c;
     i2c = new mraa::I2c(0);
     i2c->address(8);	//La direccion del esclavo es 8
 
-    uint8_t rx_tx_buf[TAMANO_MAXIMO_RESPUESTA];
-	uint8_t puntero_mensaje = 0;
-	uint8_t i = 0;
-	uint8_t tipo_mensaje;
-
     // Indefinidamente
     for (;;) {
-			//Elijo el mensaje a enviar
-				//Deberia pedirle al usuario que ingrese alguna opcion por consola?
-				//Dependiendo de lo que elija el usuario elegire el valor de tamano_respuesta
-    			//y el valor de tipo_mensaje y tamano_respuesta
-
     			//Considerar hacer una funcion crearMensaje()
-    	//limpiar_buffer(rx_tx_buf);
+    	limpiar_buffer(rx_tx_buf);
     	tipo_mensaje = recibir_pedido();
     	if(tipo_mensaje != -1){
+    		puntero_mensaje = 0;
 			//Armo el paquete
-			rx_tx_buf[0]='*';
-			puntero_mensaje = 1;
-			i = 0;
+			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
 			//Agrego el tipo del mensaje
 			rx_tx_buf[puntero_mensaje++] = tipo_mensaje;
-			rx_tx_buf[puntero_mensaje++] = '/';
+			rx_tx_buf[puntero_mensaje++] = CARACTER_SEPARADOR;
 			//Como mando mensajes OBTENER no hay payload
 			//Agrego el tamano total del mensaje
 			rx_tx_buf[puntero_mensaje++] = TAMANO_UNICO_PEDIDO;
 			//Agrego el caracter final
-			rx_tx_buf[puntero_mensaje++] = '*';
+			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
 			rx_tx_buf[puntero_mensaje] = '\0';
 
 			//Enviar por I2C
@@ -156,14 +141,15 @@ int main() {
 			sleep(1);
 			d_pin->write(0);
 
-			int leidos = i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
-			printf("Bytes leidos:%i\n", leidos);
+			i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
 
 			// Luego de un segundo, encender led e imprimir por stdout
-			rx_tx_buf[leidos-1] = '\0';
 			sleep(1);
 			d_pin->write(1);
-			printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[TAMANO_MAXIMO_RESPUESTA-1], rx_tx_buf[TAMANO_MAXIMO_RESPUESTA]);
+			printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[TAMANO_MAXIMO_RESPUESTA], rx_tx_buf[TAMANO_MAXIMO_RESPUESTA]);
+
+
+			//Aca separar el buffer en variables y... analizar? mostrar por consola?
 
 			// Forzar la salida de stdout
 			fflush(stdout);
