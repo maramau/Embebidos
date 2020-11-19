@@ -1,7 +1,12 @@
-#include "mraa.hpp"
-#include "String.h"
-
+#include <common.h>
+#include <gpio.hpp>
+#include <i2c.hpp>
+#include <types.h>
+#include <unistd.h>
+#include <cstdint>
+#include <cstdio>
 #include <iostream>
+
 using namespace std;
 
 #define TAMANO_MAXIMO_BUFFER 80	//Como maximo habra
@@ -9,6 +14,16 @@ using namespace std;
 									//+ 1 char del tamano (1 bytes)
 									//+ 14 chars del tipo de mensaje (14 bytes)
 									//+ 4 floats (16 bytes)
+#define OBTENER_TEMP 1
+#define OBTENER_MIN 2
+#define OBTENER_MAX 3
+#define OBTENER_PROM 4
+#define OBTENER_TODO 5
+#define RESPONDER_TEMP 6
+#define RESPONDER_MIN 7
+#define RESPONDER_MAX 8
+#define RESPONDER_PROM 9
+#define RESPONDER_TODO 10
 
 uint8_t tamano_respuesta;
 uint8_t tamano_pedido;
@@ -22,41 +37,41 @@ void limpiar_buffer(uint8_t* buffer){
 
 //Toma un entero por consola y elije el tipo de mensaje a enviar
 	//calcula tambien el tamano esperado de la respuesta en base a la eleccion
-char* recibir_pedido(){
+uint8_t recibir_pedido(){
 	int str;
-	char* toReturn;
+	uint8_t toReturn;
 
 	printf("Ingrese una opcion:\n 1)Obtener T actual\n 2)Obtener T maxima\n 3)Obtener T minima\n 4)Obtener T promedio\n 5)Obtener todo\n");
 	scanf("%i", &str);
 
 	switch(str){
 	case 1:
-		toReturn = "OBTENER_TEMP";
+		toReturn = OBTENER_TEMP;
 		tamano_respuesta = 24;
 		tamano_pedido =  16;
 		break;
 	case 2:
-		toReturn = "OBTENER_MAX";
+		toReturn = OBTENER_MIN;
 		tamano_respuesta = 23;
 		tamano_pedido =  15;
 		break;
 	case 3:
-		toReturn = "OBTENER_MIN";
+		toReturn = OBTENER_MAX;
 		tamano_respuesta = 23;
 		tamano_pedido =  15;
 		break;
 	case 4:
-		toReturn = "OBTENER_PROM";
+		toReturn = OBTENER_PROM;
 		tamano_respuesta = 24;
 		tamano_pedido =  16;
 		break;
 	case 5:
-		toReturn = "OBTENER_TODO";
+		toReturn = OBTENER_TODO;
 		tamano_respuesta = 39;
 		tamano_pedido =  16;
 		break;
 	default:
-		toReturn = "Nice try. Zero charisma.\n";
+		toReturn = -1;
 		tamano_respuesta = -1;
 	}
 
@@ -105,7 +120,7 @@ int main() {
     uint8_t rx_tx_buf[TAMANO_MAXIMO_BUFFER];
 	uint8_t puntero_mensaje = 0;
 	uint8_t i = 0;
-	char* tipo_mensaje;
+	uint8_t tipo_mensaje;
 
     // Indefinidamente
     for (;;) {
@@ -115,7 +130,7 @@ int main() {
     			//y el valor de tipo_mensaje y tamano_respuesta
 
     			//Considerar hacer una funcion crearMensaje()
-    	limpiar_buffer(rx_tx_buf);
+    	//limpiar_buffer(rx_tx_buf);
     	tipo_mensaje = recibir_pedido();
     	if(tamano_respuesta != -1){
 			//Armo el paquete
@@ -123,41 +138,30 @@ int main() {
 			puntero_mensaje = 1;
 			i = 0;
 			//Agrego el tipo del mensaje
-			while(tipo_mensaje[i]!='\0'){
-				rx_tx_buf[puntero_mensaje] = tipo_mensaje[i];
-				puntero_mensaje++;
-				i++;
-			}
+			rx_tx_buf[puntero_mensaje++] = tipo_mensaje;
 			rx_tx_buf[puntero_mensaje++] = '/';
 			//Como mando mensajes OBTENER no hay payload
 			//Agrego el tamano total del mensaje
-			rx_tx_buf[puntero_mensaje++]= tamano_pedido;
+			rx_tx_buf[puntero_mensaje++] = tamano_pedido;
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje] = '*';
 
 			//Enviar por I2C
+			printf("Escribo: %s\n",rx_tx_buf);
 			i2c->write(rx_tx_buf, tamano_pedido);
 
 			// Apagar led y recibir por I2C
 			sleep(1);
 			d_pin->write(0);
-			i2c->read(rx_tx_buf, tamano_respuesta);
 
-
-/*
-			//Aca puedo llamar a una funcion que tome el mensaje leido y lo separe en variables para mostrarlas por pantalla
-			i=0;
-			uint8_t temp[TAMANO_MAXIMO_BUFFER];
-			while(i<tamano_respuesta){
-				temp[i]=rx_tx_buf[i];
-				i++;
-			}
-			temp[i]='\0';*/
+			int leidos = i2c->read(rx_tx_buf, tamano_respuesta);
+			printf("Bytes leidos:%i\n", leidos);
 
 			// Luego de un segundo, encender led e imprimir por stdout
+			rx_tx_buf[leidos-1] = '\0';
 			sleep(1);
 			d_pin->write(1);
-			printf("%s %i %c\n", rx_tx_buf, rx_tx_buf[31], rx_tx_buf[32]);
+			printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[tamano_respuesta-1], rx_tx_buf[tamano_respuesta]);
 
 			// Forzar la salida de stdout
 			fflush(stdout);
