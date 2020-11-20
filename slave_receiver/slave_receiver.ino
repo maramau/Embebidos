@@ -1,7 +1,27 @@
 #include <String.h>
 #include <Wire.h>
 #include "Arduino.h"
+//*****************
+#include "String.h"
+#include "critical.h"
+#include "teclado.h"
+#include "fnqueue.h"
+#include "sensor.h"
+#include "device.h"
 
+#define UMBRAL 60.0
+#define CANT_MODOS 4
+
+conf confSensor;
+conf confTeclado;
+
+uint8_t modo = 0;
+
+//Cambio el modo (actual, maximo, minimo o promedio)
+void cambiarModo(){
+  modo = (modo + 1) % CANT_MODOS;
+}
+//**************
 #define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
 #define TAMANO_FLOAT 8
@@ -131,6 +151,14 @@ void requestEvent() {
 
 
 void setup() {
+  //**********
+  adc_setup();
+  confTeclado = teclado_setup();
+  confSensor = sensor_setup();
+
+  key_up_callback(cambiarModo, BOTON_SELECT);
+  //*********
+  
   tipo_mensaje_recibido = (char *) malloc(14*sizeof(char));
   Wire.begin(8);                // Me uno al I2C con direccion 8
   Wire.onReceive(receiveEvent); // Registro funciones a eventos
@@ -140,4 +168,13 @@ void setup() {
 
 void loop() {
   delay(100);
+  fnqueue_run();
+  Serial.print("ACT: ");
+  Serial.println(getTempAct());
+  Serial.print("MIN: ");
+  Serial.println(getTempMin());
+  Serial.print("MAX: ");
+  Serial.println(getTempMax());
+  Serial.print("PROM: ");
+  Serial.println(String(getTempProm(),2));
 }
