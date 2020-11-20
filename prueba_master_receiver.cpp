@@ -152,7 +152,7 @@ void procesarRespuesta(uint8_t* buffer){
 
 	  puntero_mensaje++;		//Salteo el caracter separador
 	  tamano_respuesta = buffer[puntero_mensaje];
-	  printf("Tamano del mensaje: %i\n", tamano_respuesta);
+	  printf("Tamano del mensaje: %i\n\n", tamano_respuesta);
 }
 
 
@@ -214,20 +214,20 @@ int main() {
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
 			rx_tx_buf[puntero_mensaje] = '\0';
-			//Enviar por I2C
-			printf("Escribo: %s\n",rx_tx_buf);
+
+			//Envio por I2C el mensaje de pedido
+				//printf("Escribo: %s\n",rx_tx_buf);
 			i2c->write(rx_tx_buf, TAMANO_UNICO_PEDIDO);
 			// Apagar led y recibir por I2C
 			sleep(1);
 			d_pin->write(0);
 
+			//Recibo por I2C el mensaje de respuesta
 			i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
-			printf("Recibo: %s\n",rx_tx_buf);
-			// Luego de un segundo, encender led e imprimir por stdout
+				//printf("Recibo: %s\n",rx_tx_buf);
+			// Luego de un segundo, enciendo el led e imprimo por consola lo recibido
 			sleep(1);
 			d_pin->write(1);
-			//printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[TAMANO_MAXIMO_RESPUESTA], rx_tx_buf[TAMANO_MAXIMO_RESPUESTA]);
-
 			//Descifro el mensaje y muestro las temperaturas obtenidas por pantalla
 			procesarRespuesta(rx_tx_buf);
 

@@ -9,18 +9,18 @@
 #include "sensor.h"
 #include "device.h"
 
-#define UMBRAL 60.0
-#define CANT_MODOS 4
+//#define UMBRAL 60.0
+//#define CANT_MODOS 4
 
 conf confSensor;
 conf confTeclado;
 
-uint8_t modo = 0;
+//uint8_t modo = 0;
 
 //Cambio el modo (actual, maximo, minimo o promedio)
-void cambiarModo(){
-  modo = (modo + 1) % CANT_MODOS;
-}
+//void cambiarModo(){
+  //modo = (modo + 1) % CANT_MODOS;
+//}
 //**************
 #define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
@@ -152,7 +152,7 @@ void requestEvent() {
   Wire.write(tamano_respuesta);
   Wire.write(CARACTER_INI_FIN);
 
-  Serial.println(mensaje);
+  //Serial.println(mensaje);
 }
 
 
@@ -170,7 +170,7 @@ void setup() {
   Wire.begin(8);                // Me uno al I2C con direccion 8
   Wire.onReceive(receiveEvent); // Registro funciones a eventos
   Wire.onRequest(requestEvent);
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 void loop() {
