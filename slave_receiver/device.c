@@ -73,15 +73,12 @@ int adc_setup(){
 }
 
 //Devuelve la estructura de la configuracion actual del canal
+  //En este caso solo se usara la configuracion del sensor
+  //No hay necesidad de cambiarla
 conf confActual(){
   conf salida = NULL;
-  /*
-  if (arrayConf[0]->confActual){
-    salida = arrayConf[0];
-  }
-  else{*/
+  
     salida = arrayConf[1];
-  //}
   
   return salida;
 }
@@ -93,27 +90,12 @@ void adc_loop(){
   conf actual = confActual();
   actual->ultMedicion = analogValSensor;
   actual->callback();
-  //cambiarCanal(actual);
   delay(1);            //Debouncing de 1 ms
                        //Si no lo hago, se lee un valor demasiado alto de temperatura 
                        //a la hora de cambiar el canal
   ADCSRA |= 1 << ADSC; //Inicio una nueva conversión (estoy en single-conversion)
   
   critical_end();
-}
-
-//Luego de realizar una lectura del ADC cambio de canal a estilo RR
-void cambiarCanal(conf canalActivo){
-   ADMUX &= ~(1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0); //Limpio el registro ADMUX
-   if (canalActivo->canal == 0){
-     ADMUX |= 1 << MUX0;
-     canalActivo->confActual = 0;
-     arrayConf[1]->confActual = 1;
-   }
-   else{
-       canalActivo->confActual = 0;
-       arrayConf[0]->confActual = 1;
-   }
 }
 
 

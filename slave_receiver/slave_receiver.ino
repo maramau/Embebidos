@@ -1,7 +1,6 @@
 #include <String.h>
 #include <Wire.h>
 #include "Arduino.h"
-//*****************
 #include "String.h"
 #include "critical.h"
 #include "teclado.h"
@@ -9,19 +8,9 @@
 #include "sensor.h"
 #include "device.h"
 
-//#define UMBRAL 60.0
-//#define CANT_MODOS 4
-
 conf confSensor;
 conf confTeclado;
 
-//uint8_t modo = 0;
-
-//Cambio el modo (actual, maximo, minimo o promedio)
-//void cambiarModo(){
-  //modo = (modo + 1) % CANT_MODOS;
-//}
-//**************
 #define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
 #define TAMANO_FLOAT 8
@@ -64,7 +53,7 @@ uint8_t seleccionar_tipo_respuesta(){
 
 //Retorna un puntero donde se escribio el payload de la respuesta
 void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
-  float f1 = 11.11, f2 = 22.22, f3 = 33.33, f4 = 44.44;
+  float f1, f2, f3, f4;
   char* toReturn;
 
   switch (tipo_mensaje_recibido){
@@ -100,11 +89,9 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
   }
 }
 
-
 // Ejecuta cada vez que recibe datos del amo
 // Es un evento, se debe asociar en el setup con Wire.onReceive()
 void receiveEvent(int howMany){
-  uint8_t i = 0;
   char c = NULL;
 
   //Tomo el tamano del mensaje
@@ -116,7 +103,6 @@ void receiveEvent(int howMany){
   if(Wire.available()>0 && c!=CARACTER_SEPARADOR){
     tipo_mensaje_recibido = (uint8_t) c;
     c = (char) Wire.read();
-    i++;
   }
 
   //Estoy apuntando al caracter FINALIZADOR
@@ -151,30 +137,19 @@ void requestEvent() {
   tamano_respuesta =(int) strlen(mensaje) + 2;
   Wire.write(tamano_respuesta);
   Wire.write(CARACTER_INI_FIN);
-
-  //Serial.println(mensaje);
 }
 
-
-
 void setup() {
-  //**********
   adc_setup();
-  //confTeclado = teclado_setup();
   confSensor = sensor_setup();
-
-  //key_up_callback(cambiarModo, BOTON_SELECT);
-  //*********
-
+  
   tipo_mensaje_recibido = (char *) malloc(14*sizeof(char));
   Wire.begin(8);                // Me uno al I2C con direccion 8
   Wire.onReceive(receiveEvent); // Registro funciones a eventos
   Wire.onRequest(requestEvent);
-  //Serial.begin(9600);
 }
 
 void loop() {
   delay(50);
-  //Serial.println(getTempAct());
   fnqueue_run();
 }

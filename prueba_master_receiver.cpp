@@ -4,10 +4,10 @@
 
 using namespace std;
 
-#define TAMANO_MAXIMO_FLOAT 5	//Cada float sera representado por 5 chars
-									//2 digitos del lado izquierdo del punto
-									//1 punto
-									//2 digitos del lado derecho del punto
+#define TAMANO_MAXIMO_FLOAT 5		//Cada float sera representado por 5 chars
+										//2 digitos del lado izquierdo del punto
+										//+1 punto
+										//+2 digitos del lado derecho del punto
 
 #define TAMANO_UNICO_PEDIDO 5		//Como maximo habra
 										//3 separadores (3 bytes)
@@ -66,7 +66,6 @@ uint8_t recibir_pedido(){
 
 	return toReturn;
 }
-
 
 //Aca separo el buffer en variables y las muestro por consola?
 //El formato es *tipo/float[-float]/tamano*
@@ -162,7 +161,6 @@ int main() {
 	uint8_t puntero_mensaje = 0;
 	uint8_t tipo_mensaje;
 
-
 	// Inicializar led conectado a GPIO y controlador de I2C
 	mraa::Gpio* d_pin = NULL;
 
@@ -197,20 +195,23 @@ int main() {
     i2c = new mraa::I2c(0);
     i2c->address(8);	//La direccion del esclavo es 8
 
-    // Indefinidamente
     for (;;) {
-    			//Considerar hacer una funcion crearMensaje()
     	tipo_mensaje = recibir_pedido();
     	if(tipo_mensaje != -1){
     		puntero_mensaje = 0;
-			//Armo el paquete
+
+    		//ARMO EL PAQUETE
 			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
+
 			//Agrego el tipo del mensaje
 			rx_tx_buf[puntero_mensaje++] = tipo_mensaje;
 			rx_tx_buf[puntero_mensaje++] = CARACTER_SEPARADOR;
+
 			//Como mando mensajes OBTENER no hay payload
+
 			//Agrego el tamano total del mensaje
 			rx_tx_buf[puntero_mensaje++] = TAMANO_UNICO_PEDIDO;
+
 			//Agrego el caracter final
 			rx_tx_buf[puntero_mensaje++] = CARACTER_INI_FIN;
 			rx_tx_buf[puntero_mensaje] = '\0';
@@ -218,17 +219,20 @@ int main() {
 			//Envio por I2C el mensaje de pedido
 				//printf("Escribo: %s\n",rx_tx_buf);
 			i2c->write(rx_tx_buf, TAMANO_UNICO_PEDIDO);
-			// Apagar led y recibir por I2C
+
+			// Apago el led
 			sleep(1);
 			d_pin->write(0);
 
 			//Recibo por I2C el mensaje de respuesta
 			i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
 				//printf("Recibo: %s\n",rx_tx_buf);
-			// Luego de un segundo, enciendo el led e imprimo por consola lo recibido
+
+			//Enciendo el led
 			sleep(1);
 			d_pin->write(1);
-			//Descifro el mensaje y muestro las temperaturas obtenidas por pantalla
+
+			//Descifro el mensaje y muestro las temperaturas obtenidas por consola
 			procesarRespuesta(rx_tx_buf);
 
 			// Forzar la salida de stdout
