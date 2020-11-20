@@ -50,16 +50,16 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
   switch (tipo_mensaje_recibido){
     case OBTENER_TEMP:
       dtostrf(f1, 3, 2, t_act);
-    break;
+      break;
     case OBTENER_MIN:
       dtostrf(f2, 3, 2, t_min);
-    break;
+      break;
     case OBTENER_MAX:
       dtostrf(f3, 3, 2, t_max);
-    break;
+      break;
     case OBTENER_PROM:
       dtostrf(f4, 3, 2, t_prom);
-    break;
+      break;
     case OBTENER_TODO:
       dtostrf(f1, 3, 2, t_act);
       strcat(t_act, "-");
@@ -68,7 +68,7 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
       dtostrf(f3, 3, 2, t_max);
       strcat(t_max, "-");
       dtostrf(f4, 3, 2, t_prom);
-    break;
+      break;
   }
 }
 

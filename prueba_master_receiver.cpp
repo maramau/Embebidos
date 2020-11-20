@@ -30,6 +30,8 @@ using namespace std;
 #define RESPONDER_PROM '9'
 #define RESPONDER_TODO '0'
 
+#define TAMANO_FLOAT 8
+
 #define CARACTER_INI_FIN '*'
 #define CARACTER_SEPARADOR '/'
 
@@ -65,8 +67,92 @@ uint8_t recibir_pedido(){
 	return toReturn;
 }
 
-void respuesta(){
 
+//Aca separo el buffer en variables y las muestro por consola?
+//El formato es *tipo/float[-float]/tamano*
+	//donde [-float] puede ser vacio o pueden ser 3 floats concatenados con un -
+void procesarRespuesta(uint8_t* buffer){
+	uint8_t tamano_respuesta, tipo_respuesta;
+	uint8_t puntero_mensaje = 1, i = 0;
+	char t_act[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
+	char t_min[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
+	char t_max[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
+	char t_prom[TAMANO_FLOAT] = {'\0', '\0', '\0', '\0', '\0'};
+
+	tipo_respuesta = buffer[puntero_mensaje++];
+	puntero_mensaje++;		//Salteo el caracter separador
+
+	  switch (tipo_respuesta){
+
+	    case RESPONDER_TEMP:
+	      while (buffer[puntero_mensaje] != '/'){
+	    	  t_act[i++] = buffer[puntero_mensaje++];
+	      }
+	      t_act[i]='\0';
+    	  printf("Temperatura actual: %s\n",t_act);
+	      break;
+
+	    case RESPONDER_MIN:
+	      while (buffer[puntero_mensaje] != '/'){
+	    	  t_min[i++] = buffer[puntero_mensaje++];
+	      }
+	      t_min[i]='\0';
+	      printf("Temperatura minima: %s\n",t_min);
+	      break;
+
+	    case RESPONDER_MAX:
+		  while (buffer[puntero_mensaje] != '/'){
+			  t_max[i++] = buffer[puntero_mensaje++];
+		  }
+		  t_max[i]='\0';
+		  printf("Temperatura maxima: %s\n",t_max);
+	      break;
+
+	    case RESPONDER_PROM:
+	      while (buffer[puntero_mensaje] != '/'){
+	    	  t_prom[i++] = buffer[puntero_mensaje++];
+	      }
+	      t_prom[i]='\0';
+	      printf("Temperatura promedio: %s\n",t_prom);
+	      break;
+
+	    case RESPONDER_TODO:
+	      while (buffer[puntero_mensaje] != '-'){
+			  t_act[i++] = buffer[puntero_mensaje++];
+		  }
+	      puntero_mensaje++;		//Salteo el separador
+	      t_act[i]='\0';
+	      i=0;
+
+		  while (buffer[puntero_mensaje] != '-'){
+			  t_min[i++] = buffer[puntero_mensaje++];
+		  }
+		  puntero_mensaje++;		//Salteo el separador
+	      t_min[i]='\0';
+	      i=0;
+
+		  while (buffer[puntero_mensaje] != '-'){
+			  t_max[i++] = buffer[puntero_mensaje++];
+		  }
+		  puntero_mensaje++;		//Salteo el separador
+	      t_max[i]='\0';
+	      i=0;
+
+		  while (buffer[puntero_mensaje] != '/'){
+			  t_prom[i++] = buffer[puntero_mensaje++];
+		  }
+	      t_prom[i]='\0';
+
+	      printf("Temperatura actual: %s\n",t_act);
+	      printf("Temperatura minima: %s\n",t_min);
+	      printf("Temperatura maxima: %s\n",t_max);
+	      printf("Temperatura promedio: %s\n",t_prom);
+	      break;
+	  }
+
+	  puntero_mensaje++;		//Salteo el caracter separador
+	  tamano_respuesta = buffer[puntero_mensaje];
+	  printf("Tamano del mensaje: %i\n", tamano_respuesta);
 }
 
 
@@ -139,11 +225,10 @@ int main() {
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);
-			printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[TAMANO_MAXIMO_RESPUESTA], rx_tx_buf[TAMANO_MAXIMO_RESPUESTA]);
+			//printf("Mensaje: %s\n Tamaño: %i\n Separador: %c\n", rx_tx_buf, rx_tx_buf[TAMANO_MAXIMO_RESPUESTA], rx_tx_buf[TAMANO_MAXIMO_RESPUESTA]);
 
-
-			//Aca separar el buffer en variables y... analizar? mostrar por consola?
-
+			//Descifro el mensaje y muestro las temperaturas obtenidas por pantalla
+			procesarRespuesta(rx_tx_buf);
 
 			// Forzar la salida de stdout
 			fflush(stdout);
