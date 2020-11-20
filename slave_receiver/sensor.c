@@ -2,7 +2,7 @@
 #include "teclado.h"
 #include <avr/interrupt.h>
 
-float tempC = 0, minTemp = 500, maxTemp = -50, promTemp = 1, sumaMuestras = 0;
+float tempC = 0, minTemp = 99.99, maxTemp = 0.00, promTemp = 1, sumaMuestras = 0;
 float muestras[100];
 uint8_t puntMuestras = 0, cantMuestras = 0;
 

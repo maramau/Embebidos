@@ -79,9 +79,9 @@ conf teclado_setup(){
   
   configTeclado = (conf)malloc(sizeof(struct adc_cfg)); //El LCD no se prende si no lo hago
                                                         //Se estara reescribiendo la memoria dinamica de la estructura?
-  configTeclado->canal = 0;
+  configTeclado->canal = 2;
   configTeclado->ultMedicion = 0;
-  configTeclado->confActual = 0;
+  configTeclado->confActual = 2;
   configTeclado->callback = debounce;
   outputTeclado = adc_init(configTeclado);
   

@@ -222,6 +222,7 @@ int main() {
 			d_pin->write(0);
 
 			i2c->read(rx_tx_buf, TAMANO_MAXIMO_RESPUESTA);
+			printf("Recibo: %s\n",rx_tx_buf);
 			// Luego de un segundo, encender led e imprimir por stdout
 			sleep(1);
 			d_pin->write(1);

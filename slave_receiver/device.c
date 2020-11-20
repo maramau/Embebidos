@@ -75,13 +75,13 @@ int adc_setup(){
 //Devuelve la estructura de la configuracion actual del canal
 conf confActual(){
   conf salida = NULL;
-  
+  /*
   if (arrayConf[0]->confActual){
     salida = arrayConf[0];
   }
-  else{
+  else{*/
     salida = arrayConf[1];
-  }
+  //}
   
   return salida;
 }
@@ -93,7 +93,7 @@ void adc_loop(){
   conf actual = confActual();
   actual->ultMedicion = analogValSensor;
   actual->callback();
-  cambiarCanal(actual);
+  //cambiarCanal(actual);
   delay(1);            //Debouncing de 1 ms
                        //Si no lo hago, se lee un valor demasiado alto de temperatura 
                        //a la hora de cambiar el canal

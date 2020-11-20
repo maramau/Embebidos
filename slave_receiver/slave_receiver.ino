@@ -69,24 +69,32 @@ void seleccionar_payload(char* t_act, char* t_min, char* t_max, char* t_prom){
 
   switch (tipo_mensaje_recibido){
     case OBTENER_TEMP:
+      f1 = getTempAct();
       dtostrf(f1, 3, 2, t_act);
       break;
     case OBTENER_MIN:
+      f2 = getTempMin();
       dtostrf(f2, 3, 2, t_min);
       break;
     case OBTENER_MAX:
+      f3 = getTempMax();
       dtostrf(f3, 3, 2, t_max);
       break;
     case OBTENER_PROM:
+      f4 = getTempProm();
       dtostrf(f4, 3, 2, t_prom);
       break;
     case OBTENER_TODO:
+      f1 = getTempAct();
       dtostrf(f1, 3, 2, t_act);
       strcat(t_act, "-");
+      f2 = getTempMin();
       dtostrf(f2, 3, 2, t_min);
       strcat(t_min, "-");
+      f3 = getTempMax();
       dtostrf(f3, 3, 2, t_max);
       strcat(t_max, "-");
+      f4 = getTempProm();
       dtostrf(f4, 3, 2, t_prom);
       break;
   }
@@ -105,7 +113,6 @@ void receiveEvent(int howMany){
     c = Wire.read();  //Tomo el primer caracter de tipo_mensaje_recibido
   }
   //Tomo el tipo de mensaje
-  Serial.println("ENTRE");
   if(Wire.available()>0 && c!=CARACTER_SEPARADOR){
     tipo_mensaje_recibido = (uint8_t) c;
     c = (char) Wire.read();
@@ -153,12 +160,12 @@ void requestEvent() {
 void setup() {
   //**********
   adc_setup();
-  confTeclado = teclado_setup();
+  //confTeclado = teclado_setup();
   confSensor = sensor_setup();
 
-  key_up_callback(cambiarModo, BOTON_SELECT);
+  //key_up_callback(cambiarModo, BOTON_SELECT);
   //*********
-  
+
   tipo_mensaje_recibido = (char *) malloc(14*sizeof(char));
   Wire.begin(8);                // Me uno al I2C con direccion 8
   Wire.onReceive(receiveEvent); // Registro funciones a eventos
@@ -167,14 +174,7 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
+  delay(50);
+  //Serial.println(getTempAct());
   fnqueue_run();
-  Serial.print("ACT: ");
-  Serial.println(getTempAct());
-  Serial.print("MIN: ");
-  Serial.println(getTempMin());
-  Serial.print("MAX: ");
-  Serial.println(getTempMax());
-  Serial.print("PROM: ");
-  Serial.println(String(getTempProm(),2));
 }
