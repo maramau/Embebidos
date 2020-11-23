@@ -1,5 +1,6 @@
 #include <Arduino_FreeRTOS.h>
 
+#define FRECUENCIA 1000
 #define LED 13
 
 // define two tasks for Blink
@@ -45,16 +46,16 @@ void TaskBlinkOn(void *pvParameters){
   
   while(1){
     digitalWrite(LED, HIGH);
-    vTaskDelay(500 / portTICK_PERIOD_MS );
+    vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
   }
 }
 
 void TaskBlinkOff(void *pvParameters){
   (void) pvParameters;
-  vTaskDelay(1000 / portTICK_PERIOD_MS );
+  vTaskDelay((FRECUENCIA/2) / portTICK_PERIOD_MS ); //Retraso inicial para que las tareas no se ejecuten a la vez
   
   while(1){
     digitalWrite(LED, LOW);
-    vTaskDelay(1000 / portTICK_PERIOD_MS );
+    vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
   }
 }
