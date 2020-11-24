@@ -30,7 +30,8 @@ void setup() {
     ,  1  // Priority
     ,  NULL );
 
-  // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
+  // Now the task scheduler, which takes over control of scheduling individual tasks
+  vTaskStartScheduler();
 }
 
 void loop(){
@@ -43,7 +44,7 @@ void loop(){
 
 void TaskBlinkOn(void *pvParameters){
   (void) pvParameters;
-  
+
   while(1){
     digitalWrite(LED, HIGH);
     vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
@@ -53,7 +54,7 @@ void TaskBlinkOn(void *pvParameters){
 void TaskBlinkOff(void *pvParameters){
   (void) pvParameters;
   vTaskDelay((FRECUENCIA/2) / portTICK_PERIOD_MS ); //Retraso inicial para que las tareas no se ejecuten a la vez
-  
+
   while(1){
     digitalWrite(LED, LOW);
     vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
