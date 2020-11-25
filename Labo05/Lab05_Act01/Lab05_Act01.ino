@@ -1,7 +1,11 @@
 #include <Arduino_FreeRTOS.h>
+#include <semphr.h>
 
 #define FRECUENCIA 1000
 #define LED 13
+
+SemaphoreHandle_t semBinOff;
+SemaphoreHandle_t semBinOn;
 
 // define two tasks for Blink
 void TaskBlinkOn(void *pvParameters);
@@ -11,31 +15,34 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
+  
+  semBinOff = xSemaphoreCreateBinary();
+  semBinOn = xSemaphoreCreateBinary();
+  xSemaphoreGive(semBinOff);
+  
   pinMode(LED, OUTPUT);
 
   // Now set up two tasks to run independently.
   xTaskCreate(
     TaskBlinkOn
-    ,  "BlinkOn"   // A name just for humans
-    ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
+    ,  "BlinkOn"
+    ,  128
     ,  NULL
-    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  2
     ,  NULL );
 
   xTaskCreate(
     TaskBlinkOff
     ,  "BlinkOff"
-    ,  128  // Stack size
+    ,  128
     ,  NULL
-    ,  1  // Priority
+    ,  1
     ,  NULL );
 
-  // Now the task scheduler, which takes over control of scheduling individual tasks
   vTaskStartScheduler();
 }
 
 void loop(){
-  // Empty. Things are done in Tasks.
 }
 
 /*--------------------------------------------------*/
@@ -44,19 +51,22 @@ void loop(){
 
 void TaskBlinkOn(void *pvParameters){
   (void) pvParameters;
-
+  
   while(1){
+    xSemaphoreTake(semBinOn, portMAX_DELAY);
     digitalWrite(LED, HIGH);
     vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
+    xSemaphoreGive(semBinOff);
   }
 }
 
 void TaskBlinkOff(void *pvParameters){
   (void) pvParameters;
-  vTaskDelay((FRECUENCIA/2) / portTICK_PERIOD_MS ); //Retraso inicial para que las tareas no se ejecuten a la vez
 
   while(1){
+    xSemaphoreTake(semBinOff, portMAX_DELAY);
     digitalWrite(LED, LOW);
     vTaskDelay(FRECUENCIA / portTICK_PERIOD_MS );
+    xSemaphoreGive(semBinOn);
   }
 }
