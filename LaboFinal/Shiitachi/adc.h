@@ -2,7 +2,7 @@
 #define ADC_C
 #include "Arduino.h"
 
-#define CANALES 2
+#define CANT_CANALES 2
 
 typedef struct adc_cfg
 {

@@ -5,8 +5,6 @@
 #include "lm35.h"
 #include <LiquidCrystal.h>
 
-
-
 #define MODOACTUAL 0
 #define MODOMINIMO 1
 #define MODOMAXIMO 2

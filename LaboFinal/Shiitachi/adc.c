@@ -5,7 +5,7 @@
 
 static volatile int16_t valorLeido;
 //Arreglo que contiene dos configuraciones (una por canal)
-conf lasConfig[CANALES];
+conf lasConfig[CANT_CANALES];
 
 int adc_init(conf cfg)
 {
@@ -47,7 +47,7 @@ conf obtenerConfiguracionActiva()
   uint8_t i = 0;
   uint8_t encontre = 0;
   conf salida = NULL;
-  while (i < CANALES && !encontre)
+  while (i < CANT_CANALES && !encontre)
   {
     if (lasConfig[i]->confActual)
     {
@@ -83,7 +83,7 @@ void adc_loop()
 void inicializarConfigs()
 {
   int i = 0;
-  for (i = 0; i < CANALES; i++)
+  for (i = 0; i < CANT_CANALES; i++)
   {
     lasConfig[i] = NULL;
   }
