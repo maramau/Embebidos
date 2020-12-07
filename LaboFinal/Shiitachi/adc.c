@@ -5,9 +5,9 @@
 
 static volatile int16_t valorLeido;
 //Arreglo que contiene dos configuraciones (una por canal)
-myCfg lasConfig[CANALES];
+conf lasConfig[CANALES];
 
-int adc_init(myCfg cfg)
+int adc_init(conf cfg)
 {
   int salida = 0;
   if (lasConfig[cfg->canal] == NULL)
@@ -42,14 +42,14 @@ int adc_setup()
   return 0;
 }
 
-myCfg obtenerConfiguracionActiva()
+conf obtenerConfiguracionActiva()
 {
   uint8_t i = 0;
   uint8_t encontre = 0;
-  myCfg salida = NULL;
+  conf salida = NULL;
   while (i < CANALES && !encontre)
   {
-    if (lasConfig[i]->configActiva)
+    if (lasConfig[i]->confActual)
     {
       encontre = 1;
       salida = lasConfig[i];
@@ -66,10 +66,10 @@ myCfg obtenerConfiguracionActiva()
 void adc_loop()
 {
   //Obtengo el canal activo
-  myCfg actual = obtenerConfiguracionActiva();
+  conf actual = obtenerConfiguracionActiva();
   //Almaceno el útlimo valor leído
   critical_begin();
-  actual->valorObtenido = valorLeido;
+  actual->ultMedicion = valorLeido;
   critical_end();
   //Ejecuto la función correspondiente
   actual->callback();
@@ -89,7 +89,7 @@ void inicializarConfigs()
   }
 }
 
-void cambiarCanal(myCfg canalActivo)
+void cambiarCanal(conf canalActivo)
 {
   if (canalActivo != NULL)
   {
@@ -97,16 +97,16 @@ void cambiarCanal(myCfg canalActivo)
     {
       ADMUX &= ~(1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0);
       ADMUX |= 1 << MUX0;
-      canalActivo->configActiva = 0;
-      lasConfig[1]->configActiva = 1;
+      canalActivo->confActual = 0;
+      lasConfig[1]->confActual = 1;
     }
     else
     {
       if (canalActivo->canal == 1)
       {
         ADMUX &= ~(1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0);
-        canalActivo->configActiva = 0;
-        lasConfig[0]->configActiva = 1;
+        canalActivo->confActual = 0;
+        lasConfig[0]->confActual = 1;
       }
     }
   }

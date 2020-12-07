@@ -2,7 +2,7 @@
 #define LM35_H
 #include <Arduino.h>
 #include <string.h>
-#include "device.h"
+#include "adc.h"
 
 #ifdef __cplusplus
 extern "C"

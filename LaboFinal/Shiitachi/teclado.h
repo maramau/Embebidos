@@ -23,7 +23,7 @@ extern "C"
 #endif
     void key_down_callback(void *handler(), int tecla);
     void key_up_callback(void *handler(), int tecla);
-    myCfg teclado_setup(void);
+    conf teclado_setup(void);
 #ifdef __cplusplus
 }
 #endif

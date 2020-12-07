@@ -7,16 +7,16 @@
 typedef struct adc_cfg
 {
 	uint8_t canal;
-	uint8_t configActiva;
-	uint16_t valorObtenido;
+	uint8_t confActual;
+	uint16_t ultMedicion;
 	void (*callback)();
-}*myCfg;
+}*conf;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-	int adc_init(myCfg cfg);
+	int adc_init(conf cfg);
 	int adc_setup(void);
 	uint16_t valorSensor(void);
 	

@@ -17,8 +17,8 @@
 #define BRILLO 200
 #define LCDPIN 10
 
-static myCfg configSensor;
-static myCfg configTeclado;
+static conf configSensor;
+static conf configTeclado;
 
 uint8_t modo = MODOACTUAL;
 float auxTempActual=0.0;
@@ -33,7 +33,7 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 void display(){
 	switch (modo){
 	  	case MODOACTUAL:
-      auxTempActual = obtenerTempActual();
+      auxTempActual = getTempAct();
 	  	lcd.setCursor(0, 0);
 	    lcd.print("Temp. Actual    ");
 	    if(auxTempActual>60.0){
@@ -42,7 +42,7 @@ void display(){
 	    }
 	    else{ 
 	  		lcd.setCursor(0, 1);
-	    	lcd.print(String("Temp: ") + obtenerTempActual());
+	    	lcd.print(String("Temp: ") + getTempAct());
 		}
      	break;
 
@@ -50,19 +50,19 @@ void display(){
 	    lcd.setCursor(0, 0);
 	    lcd.print("Temp. Min       ");
 	    lcd.setCursor(0, 1);
-	    lcd.print(String("Min T: ") + obtenerTempMin());
+	    lcd.print(String("Min T: ") + getTempMin());
 	    break;
 	  	case MODOMAXIMO:
 	    lcd.setCursor(0, 0);
 	    lcd.print("Temp. Max       ");
 	    lcd.setCursor(0, 1);
-	    lcd.print(String("Max T: ") + obtenerTempMax());
+	    lcd.print(String("Max T: ") + getTempMax());
 	    break;
 	  	case MODOPROMEDIO:
 	    lcd.setCursor(0, 0);
 	    lcd.print("Temp. Promedio ");
 	    lcd.setCursor(0, 1);
-	    lcd.print(String("Avg T: ") + obtenerTempPromedio());
+	    lcd.print(String("Avg T: ") + getTempProm());
 	    break;
   }
 }
@@ -93,7 +93,7 @@ void setup()
   adc_setup();
   //Configurar teclado
   configTeclado = teclado_setup();
-  configSensor = lm35_setup();
+  configSensor = sensor_setup();
 
   key_up_callback(up_keySelect, TECLA_SELECT);
 
@@ -107,10 +107,10 @@ void setup()
 void loop()
 {
   //display();
-  Serial.println(obtenerTempActual());
-  Serial.println(obtenerTempMin());
-  Serial.println(obtenerTempMax());
-  Serial.println(obtenerTempPromedio());
-  delay(710);
+  Serial.println(getTempAct());
+  Serial.println(getTempMin());
+  Serial.println(getTempMax());
+  Serial.println(getTempProm());
+  delay(500);
   fnqueue_run();
 }

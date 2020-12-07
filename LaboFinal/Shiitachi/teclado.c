@@ -5,7 +5,7 @@
 
 #define debounceDelay  50
 
-static myCfg configTeclado;
+static conf configTeclado;
 uint16_t adc_key_val[5] = {50, 230, 450, 535, 800};
 int8_t teclaApretada = -1;
 int16_t buttonState = -1;
@@ -39,7 +39,7 @@ void key_up_callback(void *handler(), int tecla)
 
 void debounce(){
 		//Leer el estado del pulsador
-		buttonState = configTeclado->valorObtenido;
+		buttonState = configTeclado->ultMedicion;
 
 		//Si cambió el estado del pulsador...
 		if (buttonState != lastButtonState)
@@ -75,7 +75,7 @@ void leerTecla()
   bool foundKey = false;
   while (!foundKey && i < CANT_TECLAS)
   {
-    if (configTeclado->valorObtenido < adc_key_val[i])
+    if (configTeclado->ultMedicion < adc_key_val[i])
     {
 
       lasTeclas[i].callback_keyDown();
@@ -88,7 +88,7 @@ void leerTecla()
 
   if (teclaApretada >= 0)
   {
-    if (configTeclado->valorObtenido > 900)
+    if (configTeclado->ultMedicion > 900)
     {
       lasTeclas[teclaApretada].callback_keyUp();
       teclaApretada = -1;
@@ -100,12 +100,12 @@ void funcionFalsa()
 {
 }
 
-myCfg teclado_setup()
+conf teclado_setup()
 {
-  configTeclado = (myCfg)malloc(sizeof(struct adc_cfg));
+  configTeclado = (conf)malloc(sizeof(struct adc_cfg));
   configTeclado->canal = 0;
-  configTeclado->valorObtenido = 0;
-  configTeclado->configActiva = 0;
+  configTeclado->ultMedicion = 0;
+  configTeclado->confActual = 0;
   configTeclado->callback = debounce;
 
   int outputTeclado = adc_init(configTeclado);
