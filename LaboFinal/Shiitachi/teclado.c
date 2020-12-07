@@ -103,7 +103,7 @@ void funcionFalsa()
 conf teclado_setup()
 {
   configTeclado = (conf)malloc(sizeof(struct adc_cfg));
-  configTeclado->canal = 1;
+  configTeclado->canal = 2;
   configTeclado->ultMedicion = 0;
   configTeclado->confActual = 0;
   configTeclado->callback = debounce;

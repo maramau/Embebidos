@@ -4,7 +4,7 @@
 #include "Arduino.h"
 
 static volatile int16_t valorLeido;
-//Arreglo que contiene dos configuraciones (una por canal)
+//Arreglo de configuraciones (se los asigna en las posiciones segun el canal a usar)
 conf lasConfig[CANT_CANALES];
 
 //Asigno un lugar en el arreglo de configuraciones a la configuracion dada por parametro
@@ -42,6 +42,7 @@ int adc_setup(){
 int obtenerConfiguracionActiva(){
   uint8_t i = 0;
   uint8_t encontre = 0;
+  
   while (i < CANT_CANALES && !encontre){
     if (lasConfig[i]->confActual){
       encontre = 1;
@@ -94,12 +95,14 @@ void cambiarCanal(conf canalActivo, conf canalSig){
     ADMUX &= ~(1 << MUX3 | 1 << MUX2 | 1 << MUX1 | 1 << MUX0);
     switch (next){
       case 0:
-        //ADMUX |= 1 << MUX1;
+        //Sensor de temperatura
         break;
       case 1:
+        //Fotorresistor
         ADMUX |= 1 << MUX0;
         break;
       case 2:
+        //Sensor de humedad
         ADMUX |= 1 << MUX1;
         break;
     }

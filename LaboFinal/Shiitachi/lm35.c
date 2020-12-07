@@ -1,10 +1,9 @@
-#include <stdint.h>
-#include "teclado.h"
+#include "lm35.h"
 #include <avr/interrupt.h>
 
-float tempC = 0, minTemp = 500, maxTemp = -50, promTemp = 1, sumaMuestras = 0;
-float muestras[100];
-uint8_t puntMuestras = 0, cantMuestras = 0;
+float tempC = 0, minTemp = 500, maxTemp = -50, promTemp = 1, sumaMuestrasLM35 = 0;
+float muestrasLM35[100];
+uint8_t puntMuestrasLM35 = 0, cantMuestrasLM35 = 0;
 
 static conf configSensor;
 
@@ -36,27 +35,27 @@ void setMinMaxProm(float ultTemp){
   if (maxTemp < ultTemp){
     maxTemp = ultTemp;
   }
-  promTemp = sumaMuestras / cantMuestras;
+  promTemp = sumaMuestrasLM35 / cantMuestrasLM35;
 }
 
 //Tomo la ultima medicion guardada en la configuracion del canal
-  //la guardo en mi arreglo de muestras y la proceso
+  //la guardo en mi arreglo de muestrasLM35 y la proceso
 void guardarTemps(){
   uint16_t ultMed = configSensor->ultMedicion;
-  
-  // Max_cant_volts * ultimo valor leido * factor de escala (la T crece 1C cada 10mV) 
+
+  // Max_cant_volts * ultimo valor leido * factor de escala (la T crece 1C cada 10mV)
   // Todo dividido 1024 (la cantidad de valores posibles por el analogRead())
   tempC = (5.0 * ultMed * 100.0)/1024.0;
-  sumaMuestras = sumaMuestras + tempC - muestras[puntMuestras];
-  muestras[puntMuestras] = tempC;
-  puntMuestras++;
-  if(muestras[99]==0){  //Si falta poner muestras para llenar el arreglo
-    cantMuestras=puntMuestras;
+  sumaMuestrasLM35 = sumaMuestrasLM35 + tempC - muestrasLM35[puntMuestrasLM35];
+  muestrasLM35[puntMuestrasLM35] = tempC;
+  puntMuestrasLM35++;
+  if(muestrasLM35[99]==0){  //Si falta poner muestrasLM35 para llenar el arreglo
+    cantMuestrasLM35=puntMuestrasLM35;
   }else{                //Si el arreglo esta lleno
-    cantMuestras=100;
+    cantMuestrasLM35=100;
   }
-  if (puntMuestras == 100){
-    puntMuestras = 0;
+  if (puntMuestrasLM35 == 100){
+    puntMuestrasLM35 = 0;
   }
   setMinMaxProm(tempC);
 }
@@ -64,8 +63,7 @@ void guardarTemps(){
 
 //Configuracion inicial del sensor
 conf sensor_setup(){
-  configSensor = (conf)malloc(sizeof(struct adc_cfg));  //El LCD no se prende por alguna razon si no lo hago
-                                                        //Se estara reescribiendo la memoria dinamica de la estructura?
+  configSensor = (conf)malloc(sizeof(struct adc_cfg));
   configSensor->canal = 0;
   configSensor->ultMedicion = 0;
   configSensor->confActual = 1;
