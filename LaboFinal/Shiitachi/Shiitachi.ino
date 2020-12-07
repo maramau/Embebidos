@@ -88,10 +88,10 @@ void up_keySelect()
 
 void setup()
 {
+  configSensor = sensor_setup();
+  configTeclado = teclado_setup();
   adc_setup();
   //Configurar teclado
-  configTeclado = teclado_setup();
-  configSensor = sensor_setup();
 
   key_up_callback(up_keySelect, TECLA_SELECT);
 
@@ -105,10 +105,10 @@ void setup()
 void loop()
 {
   //display();
+  fnqueue_run();
+  delay(150);
   Serial.println(getTempAct());
   Serial.println(getTempMin());
   Serial.println(getTempMax());
   Serial.println(getTempProm());
-  delay(500);
-  fnqueue_run();
 }

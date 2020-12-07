@@ -66,7 +66,7 @@ void guardarTemps(){
 conf sensor_setup(){
   configSensor = (conf)malloc(sizeof(struct adc_cfg));  //El LCD no se prende por alguna razon si no lo hago
                                                         //Se estara reescribiendo la memoria dinamica de la estructura?
-  configSensor->canal = 1;
+  configSensor->canal = 0;
   configSensor->ultMedicion = 0;
   configSensor->confActual = 1;
   configSensor->callback = guardarTemps;

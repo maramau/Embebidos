@@ -6,9 +6,9 @@
 
 typedef struct adc_cfg
 {
-	uint8_t canal;
-	uint8_t confActual;
-	uint16_t ultMedicion;
+	uint8_t canal;          //Numero del canal que va a tomar esta configuracion
+	uint8_t confActual;     //Flag que indica si esta actualmente activo o no
+	uint16_t ultMedicion;   //Ultima medicion registrada
 	void (*callback)();
 }*conf;
 
