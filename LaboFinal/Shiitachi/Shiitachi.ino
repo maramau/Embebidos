@@ -14,7 +14,6 @@ void setup(){
   ky15_setup();
   adc_setup();
 
-  dht.begin();
   Serial.begin(9600);
 }
 
@@ -25,7 +24,7 @@ void loop(){
   Serial.println(getLuz());
   Serial.print("Temperatura: ");
   Serial.println(getTempAct());
-  Serial.print("Humedad");
+  Serial.print("Humedad: ");
   Serial.println(getHum());
   /*
   Serial.println(getTempMin());

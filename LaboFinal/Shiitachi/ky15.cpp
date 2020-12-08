@@ -1,15 +1,13 @@
 #include "ky15.h"
-#include <DHT.h>
-#include <DHT_U.h>
 
 float muestrasKY15[100];
 uint8_t puntMuestrasKY15 = 0, cantMuestrasKY15 = 0;
-uint8_t lastsend = 0, time = 0;
+uint16_t millisPrev = 0, millisAct = 0;
 
 DHT dht(SENSOR,DHT11);
 
 void guardarHum(){
-  uint16_t ultMed = dht.readHumidity();
+  uint8_t ultMed = dht.readHumidity();
 
   muestrasKY15[puntMuestrasKY15++] = ultMed;
   if(muestrasKY15[99]==0){  //Si falta poner muestrasKY15 para llenar el arreglo
@@ -27,10 +25,10 @@ uint16_t getHum(){
 }
 
 void ky15_loop(){
-  time = millis();
-
-  if((time - lastsend) > 1500){
-    lastsend = time;
+  millisAct = millis();
+  //guardarHum();
+  if((millisAct - millisPrev) > 500){
+    millisPrev = millisAct;
     guardarHum();
   }
   fnqueue_add(ky15_loop);

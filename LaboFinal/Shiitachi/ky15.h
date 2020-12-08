@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <DHT.h>
-#include <DHT_U.h>
+//#include <DHT_U.h>
 #include "fnqueue.h"
 
 const int SENSOR = 2;
