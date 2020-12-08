@@ -19,7 +19,7 @@ void setup(){
 
 void loop(){
   fnqueue_run();
-  delay(500);
+  delay(1000);
   Serial.print("Luz: ");
   Serial.println(getLuz());
   Serial.print("Temperatura: ");
