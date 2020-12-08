@@ -6,7 +6,7 @@
 #include <DHT_U.h>
 #include "fnqueue.h"
 
-#define SENSOR 2
+const int SENSOR = 2;
 
 #ifdef __cplusplus
 extern "C"

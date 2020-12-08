@@ -1,4 +1,6 @@
 #include "ky15.h"
+#include <DHT.h>
+#include <DHT_U.h>
 
 float muestrasKY15[100];
 uint8_t puntMuestrasKY15 = 0, cantMuestrasKY15 = 0;
