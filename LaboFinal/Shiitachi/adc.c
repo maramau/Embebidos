@@ -65,7 +65,7 @@ void adc_loop(){
   conf actual = lasConfig[idConfActual];
   conf siguiente = lasConfig[idConfSig];
   
-  //Almaceno el útlimo valor leído de la ocnfiguracion actual
+  //Almaceno el último valor leído de la ocnfiguracion actual
   critical_begin();
   actual->ultMedicion = valorLeido;
   critical_end();
