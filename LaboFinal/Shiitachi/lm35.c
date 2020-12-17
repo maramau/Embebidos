@@ -1,8 +1,7 @@
 #include "lm35.h"
-#include <avr/interrupt.h>
 
 float tempC = 0, minTemp = 500, maxTemp = -50, promTemp = 1, sumaMuestrasLM35 = 0;
-float muestrasLM35[100];
+float muestrasLM35[CANT_MUESTRAS_LM35];
 uint8_t puntMuestrasLM35 = 0, cantMuestrasLM35 = 0;
 
 static conf configSensor;
@@ -49,12 +48,12 @@ void guardarTemps(){
   sumaMuestrasLM35 = sumaMuestrasLM35 + tempC - muestrasLM35[puntMuestrasLM35];
   muestrasLM35[puntMuestrasLM35] = tempC;
   puntMuestrasLM35++;
-  if(muestrasLM35[99]==0){  //Si falta poner muestrasLM35 para llenar el arreglo
+  if(muestrasLM35[CANT_MUESTRAS_LM35-1]==0){  //Si falta poner muestrasLM35 para llenar el arreglo
     cantMuestrasLM35=puntMuestrasLM35;
   }else{                //Si el arreglo esta lleno
-    cantMuestrasLM35=100;
+    cantMuestrasLM35=CANT_MUESTRAS_LM35;
   }
-  if (puntMuestrasLM35 == 100){
+  if (puntMuestrasLM35 == CANT_MUESTRAS_LM35){
     puntMuestrasLM35 = 0;
   }
   setMinMaxProm(tempC);
@@ -62,7 +61,7 @@ void guardarTemps(){
 
 
 //Configuracion inicial del sensor
-conf sensor_setup(){
+conf lm35_setup(){
   configSensor = (conf)malloc(sizeof(struct adc_cfg));
   configSensor->canal = 0;
   configSensor->ultMedicion = 0;

@@ -1,26 +1,39 @@
 #include "ky18.h"
-#include <avr/interrupt.h>
 
 static conf configSensor;
-float muestrasKY18[100];
+float muestrasKY18[CANT_MUESTRAS_KY18], promLuz = 1.0, sumaMuestrasKY18 = 0;
 uint8_t puntMuestrasKY18 = 0, cantMuestrasKY18 = 0;
 
-void guardarLuz(){
-  uint16_t ultMed = configSensor->ultMedicion;
 
-  muestrasKY18[puntMuestrasKY18++] = ultMed;
-  if(muestrasKY18[99]==0){  //Si falta poner muestrasKY18 para llenar el arreglo
-    cantMuestrasKY18 = puntMuestrasKY18;
-  }else{                //Si el arreglo esta lleno
-    cantMuestrasKY18 = 100;
-  }
-  if (puntMuestrasKY18 == 100){
-    puntMuestrasKY18 = 0;
-  }
+void setPromLuz(){
+  promLuz = sumaMuestrasKY18 / cantMuestrasKY18;
 }
 
-uint16_t getLuz(){
+float getLuz(){
   return muestrasKY18[puntMuestrasKY18-1];
+}
+
+float getPromLuz(){
+  return promLuz;
+}
+
+void guardarLuz(){
+  //Muestro la luminosidad como un porcentaje
+   //Luminosidad = Valor medido * 100 / Valores posibles
+  float ultMed = configSensor->ultMedicion * 100 / 1024.0; 
+
+  sumaMuestrasKY18 = sumaMuestrasKY18 + ultMed - muestrasKY18[puntMuestrasKY18];
+  muestrasKY18[puntMuestrasKY18++] = ultMed;
+  if(muestrasKY18[CANT_MUESTRAS_KY18-1]==0){  //Si falta poner muestrasKY18 para llenar el arreglo
+    cantMuestrasKY18 = puntMuestrasKY18;
+  }else{               
+    cantMuestrasKY18 = CANT_MUESTRAS_KY18;
+  }
+  if (puntMuestrasKY18 == CANT_MUESTRAS_KY18){
+    puntMuestrasKY18 = 0;
+  }
+
+  setPromLuz();
 }
 
 

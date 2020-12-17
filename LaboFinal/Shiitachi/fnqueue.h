@@ -3,8 +3,6 @@
   
   #include <stdbool.h>
   #include <stdint.h>
-  #include <Arduino.h>
-  #include <string.h>
   
   #ifdef __cplusplus
     extern "C" {

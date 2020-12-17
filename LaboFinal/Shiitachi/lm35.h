@@ -1,18 +1,17 @@
 #ifndef LM35_H
 #define LM35_H
-#include <Arduino.h>
 #include "adc.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
+  #define CANT_MUESTRAS_LM35 90
   float getTempAct(void);
   float getTempMin(void);
   float getTempMax(void);
   float getTempProm(void);
-  conf sensor_setup(void);
+  conf lm35_setup(void);
 
 #ifdef __cplusplus
 }

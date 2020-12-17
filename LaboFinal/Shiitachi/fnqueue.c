@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include <stdint.h>
 #include "fnqueue.h"
 #include "critical.h"
 
