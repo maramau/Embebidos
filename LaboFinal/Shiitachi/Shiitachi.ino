@@ -15,23 +15,24 @@
 //PRIMORDIO
 //#define TEMP_MIN_PRIMORDIO 10
 //#define TEMP_MAX_PRIMORDIO 20
-//#define HUM_MIN_PRIMORDIO 80.0
-//#define HUM_MAX_PRIMORDIO 95.0
+//#define HUM_MIN_PRIMORDIO 80
+//#define HUM_MAX_PRIMORDIO 95
 
 //VALORES EN COMUN
-#define LUM_MIN 80.0
-#define LUM_MAX 100.0
+#define LUM_MIN 80
+#define LUM_MAX 100
 
 //Defino la varianza
  //Si un valor se encuentra fuera del rango optimo, 
   //con este valor puedo discernir si el valor actual es regular o malo
 #define VARIANZA_TEMP 3
-#define VARIANZA_HUM 5.0
-#define VARIANZA_LUM 5.0
+#define VARIANZA_HUM 5
+#define VARIANZA_LUM 5
 
 //Valores actuales
 float temp_act, hum_act, lum_act;
-
+uint16_t last_send = 0, act_send = 0;
+short int etapa;
 
 char estado_humedad(float hum){
   char toReturn = 'M';
@@ -73,6 +74,42 @@ char estado_temperatura(float temp){
 }
 
 
+//Tomo los datos ambientales y los guardo en variables
+void sensarDatos(){
+  temp_act = getTempAct();
+  hum_act = getHum();
+  lum_act = getLuz();
+}
+
+void leerEtapa(){
+  String lectura;
+  
+  if(Serial.available() > 1){
+    lectura = Serial.read();
+    if(lectura = "Micelio"){
+      etapa = 0;
+    }
+    else{
+      etapa = 1;
+    }
+  }
+}
+
+//Tomo los datos leidos y los transmito por Serial
+void enviarDatos(){
+  act_send = millis();
+  if(act_send - last_send >= 1000){
+    act_send = last_send;
+    //Imprimo por el Serial los datos segun son esperados por la App
+     //Temperatura
+     Serial.print(temp_act + String( "ºC|") + getTempProm() + String( "ºC|") + String(estado_temperatura(temp_act)) + String("|"));
+     //Humedad
+     Serial.print(hum_act + String( "%|") + getPromHum() + String( "%|") + String(estado_humedad(hum_act)) + String("|"));
+     //Luminosidad
+     Serial.print(lum_act + String( "%|") + getPromLuz() + String( "%|") + String(estado_luminosidad(lum_act))); 
+  }
+}
+
 void setup(){
   lm35_setup();
   ky18_setup();
@@ -83,17 +120,9 @@ void setup(){
 }
 
 void loop(){
-  temp_act = getTempAct();
-  hum_act = getHum();
-  lum_act = getLuz();
-  
   fnqueue_run();
-  delay(1000);
-  //Imprimo por el Serial los datos segun son esperados por la App
-   //Temperatura
-   Serial.print(temp_act + String( "ºC|") + getTempProm() + String( "ºC|") + String(estado_temperatura(temp_act)) + String("|"));
-   //Humedad
-   Serial.print(hum_act + String( "%|") + getPromHum() + String( "%|") + String(estado_humedad(hum_act)) + String("|"));
-   //Luminosidad
-   Serial.print(lum_act + String( "%|") + getPromLuz() + String( "%|") + String(estado_luminosidad(lum_act)));
+
+  sensarDatos();
+  leerEtapa();
+  enviarDatos();
 }
