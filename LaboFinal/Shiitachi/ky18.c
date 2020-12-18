@@ -13,7 +13,7 @@ uint16_t getLuz(){
   return muestrasKY18[puntMuestrasKY18-1];
 }
 
-float getPromLuz(){
+uint16_t getPromLuz(){
   return promLuz;
 }
 

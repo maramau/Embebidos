@@ -11,7 +11,7 @@ extern "C"
   void guardarLuz(void);
   conf ky18_setup(void);
   uint16_t getLuz(void);
-  float getPromLuz(void);
+  uint16_t getPromLuz(void);
   
 #ifdef __cplusplus
 }
