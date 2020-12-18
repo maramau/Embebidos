@@ -5,7 +5,7 @@
 #include "fnqueue.h"
 
 const int SENSOR = 2;
-const int CANT_MUESTRAS_KY15 = 90;
+const int CANT_MUESTRAS_KY15 = 100;
 #ifdef __cplusplus
 extern "C"
 {

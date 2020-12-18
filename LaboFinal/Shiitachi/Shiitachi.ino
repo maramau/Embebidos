@@ -19,20 +19,19 @@
 //#define HUM_MAX_PRIMORDIO 95
 
 //VALORES EN COMUN
-#define LUM_MIN 80
-#define LUM_MAX 100
+#define LUM_MIN 600
+#define LUM_MAX 1023
 
 //Defino la varianza
  //Si un valor se encuentra fuera del rango optimo, 
   //con este valor puedo discernir si el valor actual es regular o malo
 #define VARIANZA_TEMP 3
 #define VARIANZA_HUM 5
-#define VARIANZA_LUM 5
+#define VARIANZA_LUM 50
 
 //Valores actuales
-float temp_act, hum_act, lum_act;
-uint16_t last_send = 0, act_send = 0;
-short int etapa;
+float temp_act = 0.0, hum_act = 0.0;
+uint16_t lum_act = 0, last_send = 0, act_send = 0;
 
 char estado_humedad(float hum){
   char toReturn = 'M';
@@ -81,32 +80,18 @@ void sensarDatos(){
   lum_act = getLuz();
 }
 
-void leerEtapa(){
-  String lectura;
-  
-  if(Serial.available() > 1){
-    lectura = Serial.read();
-    if(lectura = "Micelio"){
-      etapa = 0;
-    }
-    else{
-      etapa = 1;
-    }
-  }
-}
-
 //Tomo los datos leidos y los transmito por Serial
 void enviarDatos(){
   act_send = millis();
   if(act_send - last_send >= 1000){
-    act_send = last_send;
+    last_send = act_send;
     //Imprimo por el Serial los datos segun son esperados por la App
      //Temperatura
      Serial.print(temp_act + String( "ºC|") + getTempProm() + String( "ºC|") + String(estado_temperatura(temp_act)) + String("|"));
      //Humedad
      Serial.print(hum_act + String( "%|") + getPromHum() + String( "%|") + String(estado_humedad(hum_act)) + String("|"));
      //Luminosidad
-     Serial.print(lum_act + String( "%|") + getPromLuz() + String( "%|") + String(estado_luminosidad(lum_act))); 
+     Serial.print(lum_act + String( "|") + getPromLuz() + String( "|") + String(estado_luminosidad(lum_act))); 
   }
 }
 
@@ -121,8 +106,6 @@ void setup(){
 
 void loop(){
   fnqueue_run();
-
   sensarDatos();
-  leerEtapa();
   enviarDatos();
 }

@@ -7,10 +7,10 @@
 extern "C"
 {
 #endif
-  #define CANT_MUESTRAS_KY18 90
+  #define CANT_MUESTRAS_KY18 100
   void guardarLuz(void);
   conf ky18_setup(void);
-  float getLuz(void);
+  uint16_t getLuz(void);
   float getPromLuz(void);
   
 #ifdef __cplusplus

@@ -6,7 +6,7 @@
 extern "C"
 {
 #endif
-  #define CANT_MUESTRAS_LM35 90
+  #define CANT_MUESTRAS_LM35 100
   float getTempAct(void);
   float getTempMin(void);
   float getTempMax(void);
