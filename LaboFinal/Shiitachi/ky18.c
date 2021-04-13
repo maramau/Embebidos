@@ -1,7 +1,7 @@
 #include "ky18.h"
 
 static conf configSensor;
-uint16_t muestrasKY18[CANT_MUESTRAS_KY18], promLuz = 1.0, sumaMuestrasKY18 = 0;
+float muestrasKY18[CANT_MUESTRAS_KY18], promLuz = 1.0, sumaMuestrasKY18 = 0;
 uint8_t puntMuestrasKY18 = 0, cantMuestrasKY18 = 0;
 
 
