@@ -1,0 +1,63 @@
+ACTIVIDAD 1.1
+
+1)Por que no funciona analogRead dentro del ISR dentro del .cpp? Se queda parado como en una especie de ciclo infinito o esperando algo
+	RTA: analogRead() te hace un polling y espera a leer un valor del ADC y espera a que se setee un flag (que parece que nunca se setea porque estoy dentro de la interrupcion misma)
+
+
+ACTIVIDAD 1.2
+Estime la frecuencia de muestreo necesaria para obtener los valores utilizados en el cálculo
+de la temperatura promedio. Yo quiero 100 muestras cada 15 segundos.
+Como calcularla? 
+	RTA:Puedo setear el prescaler o usar los timers para contar hasta un punto.
+	Lo malo de usar el prescaler es que perderia precision, pero en esta app no es tan importante.
+
+Me falta tambien hacer que se comunique el teclado y el ADC por distintos canales.
+	RTA:Basicamente tengo que cambiar los MUX a cada rato para atender necesidades de cada uno.
+	ADMUX y bits MUX (son 4 bits 0 a 3). 
+	MUY IMPORTANTE: Debo setear el modo Single Conversion poniendo ADATE en 0
+
+Cual es la diferencia entre:
+	ADMUX |= conf.canal; (siendo canal un int)
+	ADMUX |= 1<<MUX1;
+	No pareceria haber diferencia practica. Los dos al final se interpretan como quiero
+
+
+
+ACTIVIDAD 2
+Estoy leyendo nulls del Serial demasiado seguido. Por que sera?
+RTA:
+
+
+
+OTROS
+Pendientes:
+Que tan costoso es hacer una interrupcion? Llamar a una interrupcion del timer cada segundo solo para aumentar en uno un contador no suena muy eficiente
+por que no Aumentan contadores automaticamente?
+Que tan grande es el overhead de una interrupcion? Ronda en los ms?
+
+
+Respondidas:
+No es necesario usar malloc(), no hay SO en el arduino. Hay un hack para la reserva de memoria hecha por la comunidad (leer sobre eso)
+
+
+
+
+German:
+Dejo una pregu: ¿dado que critical begin y end producen anidamientos (de habilitación y deshabilitación de interrupciones), 
+cuando corresponde usarlos en lugar de cli y sei?
+
+Mariano Maisonnave:
+Hola @Germán , el critical begin y end brindan la misma función que el cli y sei, 
+solo que permiten anidamiento sin que haya problema. 
+Esto te garantiza que si se hicieron dos critial_begin en dos lugares distintos, 
+las interrupciones no se van a volver a habilitar hasta que haya dos critical_end en algún lado. 
+Por esta razón te puede traer menos problemas que usar el cli y sei así pelado. 
+Si el código es muy pequeño/sencillo y sabes que no se van anidar dos cli, 
+podes usar solo cli y sei, pero en general no hay razón para no usar critial_begin y critical_end, 
+como dije antes, brindan la misma funcionalidad e incluso agregan lo del anidamiento sin agregar ninguna desventaja. 
+Saludos!
+También recorda que por más que uses critial_begin y end en todos lados, con tal de que uses UN solo cli y sei, ya podes estar tirando a la basura todo el sistema de anidamiento del critical_begin y critical_end. Así que tampoco tiene sentido mezclarlos. Yo usaría solo critical_begin y end.
+
+
+
+
