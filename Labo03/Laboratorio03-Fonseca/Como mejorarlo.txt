@@ -1,0 +1,6 @@
+1) El boton SELECT no funciona. La cague en alguna de las modificaciones que hice
+para resolverlo ver y copiar el codigo de German. En el suyo si funcionaba
+
+
+2) Segun Mario Maiso lo ideal hubiera sido que las funciones de la actividad 2 
+(mandar muestras y recibirModo) se encolen a la estructura provista por la catedra

@@ -1,0 +1,23 @@
+COMO MEJORAR EL LABO02 (en caso de reentrega)
+
+Cuando seteo el reloj el lcd se apaga.
+Esto pasa porque se mandan senales PWM del timer 1 a la pantalla para prenderla. 
+Se soluciona usando el timer 2. El temita es que el timer 2 es de 8 bit. Tengo que reconfigurar esa parte.
+
+
+
+Que onda con la macro __cplusplus?
+Le pregunte a Jose y es basicamente lo que sospechaba. Necesito forzar al compilador a que busque la definicion de funciones en los .C yeste solo lo hace con los .cpp  Me recomendo hablarlo con Andres que por ahi el sabia mas.
+
+
+
+Considerar usar VIM, Segun Jose es un editor de texto muy poderoso (aunque  mi me da asquito).
+
+
+El cambiador de brillo hace overflow. Hago que vaya de 0 a 5, cuando solo debria ir de 0 a 4.
+
+
+Sacar el debouncing que esta adentro de la interrupcion y ponerla cuando se aprietan los botones
+
+
+Cuando esta en el modo Contador ascendente no se muestra en pantalla el tiempo actual que corre. Deberia poder mejorarse faiclmente usando Serial y verificando el modo (no recuerdo si el contador corre en background en otros modos)
